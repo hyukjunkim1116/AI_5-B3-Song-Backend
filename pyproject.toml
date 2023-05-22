@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "ai-5-b3-sitename-backend"
+version = "0.1.0"
+description = ""
+authors = ["minjeong <ehdro418@naver.com>"]
+readme = "README.md"
+packages = [{include = "ai_5_b3_sitename_backend"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+djangorestframework = "^3.14.0"
+djangorestframework-simplejwt = "^5.2.2"
+black = "^23.3.0"
+pillow = "^9.5.0"
+django-cors-headers = "^4.0.0"
+mysqlclient = "^2.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
