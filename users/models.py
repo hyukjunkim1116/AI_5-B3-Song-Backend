@@ -42,7 +42,7 @@ class User(AbstractBaseUser):
         ("M", "Male"),
         ("F", "Female"),
     ]
-
+    avatar = models.URLField(blank=True)
     email = models.EmailField("이메일", max_length=255, unique=True)
     nickname = models.CharField("닉네임", max_length=20, unique=True)
     password = models.CharField("비밀번호", max_length=256)
