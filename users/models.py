@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.urls import reverse
 
 
 class UserManager(BaseUserManager):
@@ -64,6 +65,9 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.nickname
+    
+    def get_absolute_url(self):
+        return reverse("profile_view", kwargs={"user_id": self.pk})
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
