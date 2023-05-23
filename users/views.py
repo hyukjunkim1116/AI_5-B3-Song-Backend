@@ -4,13 +4,14 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound, PermissionDenied
 from medias.serializers import PhotoSerializer, UserPhotoSerializer
+from rest_framework.generics import get_object_or_404
+from users.models import User
 from users.serializers import UserSerializer
-from .models import User
 
 
-# Create your views here.
 class UserView(APIView):
     def post(self, request):
+        """회원가입"""
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -41,3 +42,11 @@ class UserPhotoView(APIView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
+
+
+class ProfileView(APIView):
+    def get(self, request, user_id):
+        """유저 프로필 조회"""
+        user = get_object_or_404(User, id=user_id)
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
