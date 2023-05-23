@@ -45,12 +45,7 @@ class UserTest(APITestCase):
         
     def test_get_user_data(self):
         """유저 프로필 조회 테스트"""
-        login = self.client.post(reverse("token_obtain_pair"), self.data)
-        access_token = login.data["access"]
         url = self.user.get_absolute_url()
-        response = self.client.get(
-            path=url,
-            HTTP_AUTHORIZATION=f"Bearer {access_token}"
-        )
-        # self.assertEqual(response.status_code, 200)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["email"], self.data["email"])
