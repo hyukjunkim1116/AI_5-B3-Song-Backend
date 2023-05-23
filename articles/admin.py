@@ -1,5 +1,12 @@
 from django.contrib import admin
-from articles.models import Comment
+from .models import Article, Comment
 
-# Register your models here.
-admin.site.register(Comment)
+
+@admin.register(Article)
+class RoomAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Comment)
+class RoomAdmin(admin.ModelAdmin):
+    pass
