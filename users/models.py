@@ -3,7 +3,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, username, password=None):
+    def create_user(self, email, nickname, password=None):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -13,14 +13,14 @@ class UserManager(BaseUserManager):
 
         user = self.model(
             email=self.normalize_email(email),
-            username=username,
+            nickname=nickname,
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, password=None):
+    def create_superuser(self, email, nickname, password=None):
         """
         Creates and saves a superuser with the given email, date of
         birth and password.
@@ -28,7 +28,7 @@ class UserManager(BaseUserManager):
 
         user = self.create_user(
             email,
-            username=username,
+            nickname=nickname,
             password=password,
         )
         user.is_admin = True
@@ -48,15 +48,14 @@ class User(AbstractBaseUser):
     genre = models.CharField("장르", max_length=256, null=True, blank=True)
     age = models.IntegerField("나이", null=True)
     gender = models.CharField("성별", max_length=1, choices=GENDERS)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     followings = models.ManyToManyField(
         "self", symmetrical=False, related_name="followers", blank=True
     )
 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     objects = UserManager()
 
