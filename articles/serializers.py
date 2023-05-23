@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from medias.serializers import PhotoSerializer
-from .models import Article
+from .models import Article, Comment
 
 
 class ArticleListSerializer(serializers.ModelSerializer):
@@ -21,3 +21,20 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         exclude = ("owner",)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        return obj.user.email
+
+    class Meta:
+        model = Comment
+        exclude = ("article",)
+
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ("comment",)

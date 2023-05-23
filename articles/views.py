@@ -1,3 +1,5 @@
+from rest_framework import status
+from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -8,8 +10,13 @@ from rest_framework.exceptions import (
     ParseError,
     PermissionDenied,
 )
-from .serializers import ArticleListSerializer, ArticleDetailSerializer
-from .models import Article
+from .serializers import (
+    ArticleListSerializer,
+    ArticleDetailSerializer,
+    CommentSerializer,
+    CommentCreateSerializer,
+)
+from .models import Article, Comment
 from medias.serializers import PhotoSerializer
 
 
@@ -109,3 +116,45 @@ class ArticlePhotos(APIView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
+
+
+class CommentsView(APIView):
+    def get(self, request, article_id):
+        """댓글 보기"""
+        articles = Article.objects.get(id=article_id)
+        comments = articles.comments.all()
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, article_id):
+        """댓글 작성"""
+        serializer = CommentCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user, article_id=article_id)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CommentsDetailView(APIView):
+    def put(self, request, article_id, comment_id):
+        """댓글 수정"""
+        comment = get_object_or_404(Comment, id=comment_id)
+        if request.user == comment.user:
+            serializer = CommentCreateSerializer(comment, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response("권한이 없습니다!", status=status.HTTP_403_FORBIDDEN)
+
+    def delete(self, request, article_id, comment_id):
+        """댓글 삭제"""
+        comment = get_object_or_404(Comment, id=comment_id)
+        if request.user == comment.user:
+            comment.delete()
+            return Response("삭제되었습니다!", status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response("권한이 없습니다!", status=status.HTTP_403_FORBIDDEN)
