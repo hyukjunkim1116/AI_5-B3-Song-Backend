@@ -65,7 +65,7 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.nickname
-    
+
     def get_absolute_url(self):
         return reverse("profile_view", kwargs={"user_id": self.pk})
 
