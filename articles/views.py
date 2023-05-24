@@ -122,7 +122,7 @@ class CommentsView(APIView):
     def get(self, request, article_id=None):
         """댓글 보기"""
         if article_id:
-            articles = Article.objects.get(id=article_id)
+            articles = get_object_or_404(Article, id=article_id)
             comments = articles.comments.all()
         else:
             comments = Comment.objects.all()
