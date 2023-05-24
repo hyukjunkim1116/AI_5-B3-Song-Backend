@@ -98,6 +98,7 @@ class KakaoLogin(APIView):
                 )
             else:
                 return Response(user.login_type, status=status.HTTP_400_BAD_REQUEST)
+
         except User.DoesNotExist:
             new_user = User.objects.create(
                 avatar=kakao_profile_image,
@@ -107,4 +108,8 @@ class KakaoLogin(APIView):
             )
             new_user.set_unusable_password()
             new_user.save()
-            return Response(user_data, status=status.HTTP_200_OK)
+            refresh = RefreshToken.for_user(new_user)
+            return Response(
+                {"refresh": str(refresh), "access": str(refresh.access_token)},
+                status=status.HTTP_200_OK,
+            )
