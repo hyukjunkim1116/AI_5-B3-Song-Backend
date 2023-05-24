@@ -14,4 +14,6 @@ urlpatterns = [
         name="comments_detail_view",
     ),
     path("like/<int:comment_id>/", views.LikeView.as_view(), name="like_view"),
+    path("bookmark/<int:article_id>/",
+         views.BookmarkView.as_view(), name="bookmark_view"),
 ]
