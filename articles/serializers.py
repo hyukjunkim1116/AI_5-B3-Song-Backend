@@ -5,6 +5,7 @@ from .models import Article, Comment
 
 class ArticleListSerializer(serializers.ModelSerializer):
     photos = PhotoSerializer(many=True, read_only=True)
+    created_at = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
 
     class Meta:
         model = Article
@@ -12,6 +13,7 @@ class ArticleListSerializer(serializers.ModelSerializer):
             "pk",
             "title",
             "photos",
+            "created_at",
         )
 
 
@@ -25,13 +27,17 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
+    like_count = serializers.SerializerMethodField()
 
     def get_user(self, obj):
         return obj.user.email
 
+    def get_like_count(self, obj):
+        return obj.like.count()
+
     class Meta:
         model = Comment
-        exclude = ("article",)
+        fields = "__all__"
 
 
 class CommentCreateSerializer(serializers.ModelSerializer):
