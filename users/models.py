@@ -54,10 +54,19 @@ class User(AbstractBaseUser):
     followings = models.ManyToManyField(
         "self", symmetrical=False, related_name="followers", blank=True
     )
+    LOGIN_TYPES = [
+        ("normal", "일반"),
+        ("kakao", "카카오"),
+        ("google", "구글"),
+        ("github", "깃허브"),
+        ("naver", "네이버"),
+    ]
+    login_type = models.CharField(
+        "로그인유형", max_length=10, choices=LOGIN_TYPES, default="normal"
+    )
 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-
     objects = UserManager()
 
     USERNAME_FIELD = "email"
