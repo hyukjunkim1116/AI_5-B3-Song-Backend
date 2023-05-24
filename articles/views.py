@@ -170,3 +170,15 @@ class LikeView(APIView):
         else:
             comment.like.add(request.user)
             return Response("like", status=status.HTTP_200_OK)
+        
+        
+class BookmarkView(APIView):
+    def post(self, request, article_id):
+        """게시글 북마크 하기"""
+        article = get_object_or_404(Article, id=article_id)
+        if request.user in article.bookmark.all():
+            article.bookmark.remove(request.user)
+            return Response("unbookmark", status=status.HTTP_200_OK)
+        else:
+            article.bookmark.add(request.user)
+            return Response("bookmark", status=status.HTTP_200_OK)

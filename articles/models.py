@@ -10,6 +10,7 @@ class Article(models.Model):
         on_delete=models.CASCADE,
         related_name="articles",
     )
+    bookmark = models.ManyToManyField(User, verbose_name="북마크", related_name="bookmarks")
 
 
 class Comment(models.Model):
