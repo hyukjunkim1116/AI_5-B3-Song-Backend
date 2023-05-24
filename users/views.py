@@ -57,6 +57,9 @@ class ProfileView(APIView):
 
 
 class KakaoLogin(APIView):
+    def get(self, request):
+        return Response(KAKAO_REST_API_KEY, status=status.HTTP_200_OK)
+
     def post(self, request):
         """카카오 로그인"""
         auth_code = request.data.get("code")
