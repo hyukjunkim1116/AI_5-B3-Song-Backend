@@ -11,6 +11,8 @@ class Article(models.Model):
         related_name="articles",
     )
     bookmark = models.ManyToManyField(User, blank=True, verbose_name="북마크", related_name="bookmarks")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Comment(models.Model):
