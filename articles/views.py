@@ -24,7 +24,7 @@ class Articles(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request):
-        all_articles = Article.objects.all()
+        all_articles = Article.objects.all().order_by("-created_at")
         serializer = ArticleListSerializer(
             all_articles,
             many=True,
@@ -119,10 +119,13 @@ class ArticlePhotos(APIView):
 
 
 class CommentsView(APIView):
-    def get(self, request, article_id):
+    def get(self, request, article_id=None):
         """댓글 보기"""
-        articles = get_object_or_404(Article, id=article_id)
-        comments = articles.comments.all()
+        if article_id:
+            articles = Article.objects.get(id=article_id)
+            comments = articles.comments.all()
+        else:
+            comments = Comment.objects.all()
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
