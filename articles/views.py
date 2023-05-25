@@ -48,22 +48,22 @@ class Articles(APIView):
         )
         return Response(serializer.data)
 
-    # def post(self, request):
-    #     serializer = ArticleDetailSerializer(
-    #         data=request.data,
-    #     )
-    #     if serializer.is_valid():
-    #         try:
-    #             article = serializer.save(owner=request.user)
-    #             serializer = ArticleDetailSerializer(article)
-    #             return Response(serializer.data)
-    #         except Exception as e:
-    #             print(e)
-    #     else:
-    #         return Response(
-    #             serializer.errors,
-    #             status=HTTP_400_BAD_REQUEST,
-    #         )
+    def post(self, request):
+        serializer = ArticleDetailSerializer(
+            data=request.data,
+        )
+        if serializer.is_valid():
+            try:
+                article = serializer.save(owner=request.user)
+                serializer = ArticleDetailSerializer(article)
+                return Response(serializer.data)
+            except Exception as e:
+                print(e)
+        else:
+            return Response(
+                serializer.errors,
+                status=HTTP_400_BAD_REQUEST,
+            )
 
     # def post(self, request):
     #     serializer = ArticleDetailSerializer(data=request.data)
