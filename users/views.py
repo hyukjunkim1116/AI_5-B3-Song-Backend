@@ -5,12 +5,16 @@ from medias.serializers import PhotoSerializer, UserPhotoSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.generics import get_object_or_404
-from users.serializers import UserSerializer, UserUpdateSerializer
+from users.serializers import UserSerializer
 from users.models import User
+from articles.models import Article, Comment
+from articles.serializers import ArticleListSerializer,CommentSerializer
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+
+
 
 
 class UserView(APIView):
@@ -66,7 +70,7 @@ class ProfileView(APIView):
         user = get_object_or_404(User, id=user_id)
         # 현재유저와 수정하려는 유저가 일치한다면
         if request.user.id == user_id:
-            serializer = UserUpdateSerializer(user, data=request.data)
+            serializer = UserSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -100,6 +104,36 @@ class ProfileView(APIView):
                 return Response(f"{user.email}계정이 활성화 되었습니다!", status=status.HTTP_204_NO_CONTENT)
         else:
             return Response("권한이 없습니다!", status=status.HTTP_403_FORBIDDEN)
+
+
+class ProfileAticlesView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, user_id):
+        """유저 프로필 게시글 조회"""
+        user_articles = Article.objects.filter(owner_id=user_id)
+        serializer = ArticleListSerializer(
+            user_articles,
+            many=True,
+            context={"request": request},
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ProfileLikesView(APIView):
+    def get(self, request, user_id):
+        """유저 프로필 좋아요 조회"""
+        comments = Comment.objects.filter(like=user_id)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ProfileBookmarksView(APIView):
+    def get(self, request, user_id):
+        """유저 프로필 북마크 조회"""
+        user_articles = Article.objects.filter(bookmark=user_id)
+        serializer = ArticleListSerializer(user_articles,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 
 
 class KakaoLogin(APIView):
@@ -159,3 +193,4 @@ class KakaoLogin(APIView):
                 {"refresh": str(refresh), "access": str(refresh.access_token)},
                 status=status.HTTP_200_OK,
             )
+    
