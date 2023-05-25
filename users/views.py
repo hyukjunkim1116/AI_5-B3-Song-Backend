@@ -143,6 +143,10 @@ class ProfileBookmarksView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+############################ 소셜 로그인 ############################
+# 각각의 get 메소드는 프론트에 api key를 전달하기 위한 메소드입니다.
+# 각각의 post 메소드는 프론트에서 받은 데이터로 액세스 토큰과 유저 데이터를 받아와서 SocialLogin함수를 호출합니다.
+# SocialLogin 함수는 해당 정보를 바탕으로 유저가 있다면 로그인하고, 없다면 유저를 생성합니다.
 class KakaoLogin(APIView):
     """카카오 소셜 로그인"""
 
@@ -265,6 +269,7 @@ def SocialLogin(**kwargs):
         # pw는 사용불가로 지정
         new_user.set_unusable_password()
         new_user.save()
+        # 이후 토큰 발급해서 프론트로
         refresh = RefreshToken.for_user(new_user)
         return Response(
             {"refresh": str(refresh), "access": str(refresh.access_token)},
