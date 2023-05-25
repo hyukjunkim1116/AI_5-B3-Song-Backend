@@ -142,6 +142,7 @@ class ProfileBookmarksView(APIView):
         serializer = ArticleListSerializer(user_articles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class FollowView(APIView):
     def get(self, request, user_id):
         """유저 팔로우한 유저들 조회"""
@@ -269,7 +270,9 @@ def SocialLogin(**kwargs):
     # 그 중 email이 없으면 회원가입이 불가능하므로
     # 프론트에서 메시지를 띄워주고, 다시 로그인 페이지로 이동시키기
     if not email:
-        return Response({"error": "no_email"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"error": "해당 계정에 email정보가 없습니다."}, status=status.HTTP_400_BAD_REQUEST
+        )
     try:
         user = User.objects.get(email=email)
         # 로그인 타입까지 같으면, 토큰 발행해서 프론트로 보내주기
@@ -282,7 +285,10 @@ def SocialLogin(**kwargs):
         # 유저의 다른 소셜계정으로 로그인한 유저라면, 해당 로그인 타입을 보내줌.
         # (프론트에서 "{login_type}으로 로그인한 계정이 있습니다!" alert 띄워주기)
         else:
-            return Response(user.login_type, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": f"{user.login_type}으로 이미 가입된 계정이 있습니다!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
     # 유저가 존재하지 않는다면 회원가입시키기
     except User.DoesNotExist:
         new_user = User.objects.create(**data)
