@@ -44,6 +44,7 @@ class Articles(APIView):
         return JsonResponse({"detail": str(exception)}, status=500)
 
     def get(self, request):
+        """전체 게시글 목록 보기"""
         all_articles = Article.objects.all().order_by("-created_at")
         serializer = ArticleListSerializer(
             all_articles,
@@ -53,6 +54,7 @@ class Articles(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        """게시글 작성하기"""
         serializer = ArticleDetailSerializer(
             data=request.data,
             # context={"request": request},
@@ -111,6 +113,7 @@ class ArticleDetail(APIView):
             raise NotFound
 
     def get(self, request, article_id):
+        """상세 게시글 보기"""
         article = self.get_object(article_id)
         serializer = ArticleDetailSerializer(
             article,
@@ -119,6 +122,7 @@ class ArticleDetail(APIView):
         return Response(serializer.data)
 
     def put(self, request, article_id):
+        """게시글 수정하기"""
         article = self.get_object(article_id)
 
         if article.owner != request.user:
@@ -140,6 +144,7 @@ class ArticleDetail(APIView):
             return Response(serializer.errors)
 
     def delete(self, request, article_id):
+        """게시글 삭제하기"""
         article = self.get_object(article_id)
         if article.owner != request.user:
             raise PermissionDenied
@@ -157,6 +162,7 @@ class ArticlePhotos(APIView):
             raise NotFound
 
     def post(self, request, article_id):
+        """게시글 사진 올리기"""
         article = self.get_object(article_id)
         if request.user != article.owner:
             raise PermissionDenied
@@ -240,6 +246,9 @@ class BookmarkView(APIView):
 
 class SearchView(APIView):
     def get(self, request, query):
+        """검색하기
+        
+        제목이나 내용에 입력한 검색어가 포함되어 있는 게시글들을 가져옴"""
         decoded_query = urllib.parse.unquote(query)
         articles = Article.objects.filter(Q(title__contains=decoded_query) | Q(content__contains=decoded_query))
         serializer = ArticleListSerializer(articles, many=True)
