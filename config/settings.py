@@ -30,7 +30,7 @@ CF_TOKEN = my_settings.CF_TOKEN["CF_TOKEN"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1"]
 
 
 # Application definition
@@ -196,4 +196,4 @@ CORS_ALLOW_HEADERS = (
 
 AUTH_USER_MODEL = "users.User"
 
-API_BASE_URL = "http://localhost:8000/api"
+API_BASE_URL = "http://127.0.0.1:8000/api"

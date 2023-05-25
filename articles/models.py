@@ -10,6 +10,9 @@ class Article(models.Model):
         on_delete=models.CASCADE,
         related_name="articles",
     )
+    bookmark = models.ManyToManyField(User, blank=True, verbose_name="북마크", related_name="bookmarks")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Comment(models.Model):
@@ -18,6 +21,7 @@ class Comment(models.Model):
         Article, on_delete=models.CASCADE, related_name="comments"
     )
     comment = models.TextField()
+    like = models.ManyToManyField(User, blank=True, verbose_name="좋아요", related_name="like_posts")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
