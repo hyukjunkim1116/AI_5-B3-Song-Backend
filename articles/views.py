@@ -227,8 +227,8 @@ class LikeView(APIView):
         else:
             comment.like.add(request.user)
             return Response("like", status=status.HTTP_200_OK)
-        
-        
+
+          
 class BookmarkView(APIView):
     def post(self, request, article_id):
         """게시글 북마크 하기"""
