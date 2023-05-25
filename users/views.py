@@ -49,6 +49,7 @@ class UserPhotoView(APIView):
             raise NotFound
 
     def post(self, request, user_id):
+        """유저 프로필 사진 올리기"""
         user = self.get_object(user_id)
         if request.user != user:
             raise PermissionDenied
