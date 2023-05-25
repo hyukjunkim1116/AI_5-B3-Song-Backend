@@ -24,7 +24,7 @@ class Articles(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request):
-        all_articles = Article.objects.all()
+        all_articles = Article.objects.all().order_by("-created_at")
         serializer = ArticleListSerializer(
             all_articles,
             many=True,
@@ -119,10 +119,13 @@ class ArticlePhotos(APIView):
 
 
 class CommentsView(APIView):
-    def get(self, request, article_id):
+    def get(self, request, article_id=None):
         """댓글 보기"""
-        articles = Article.objects.get(id=article_id)
-        comments = articles.comments.all()
+        if article_id:
+            articles = get_object_or_404(Article, id=article_id)
+            comments = articles.comments.all()
+        else:
+            comments = Comment.objects.all()
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -137,7 +140,7 @@ class CommentsView(APIView):
 
 
 class CommentsDetailView(APIView):
-    def put(self, request, article_id, comment_id):
+    def put(self, request, comment_id):
         """댓글 수정"""
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.user:
@@ -150,7 +153,7 @@ class CommentsDetailView(APIView):
         else:
             return Response("권한이 없습니다!", status=status.HTTP_403_FORBIDDEN)
 
-    def delete(self, request, article_id, comment_id):
+    def delete(self, request, comment_id):
         """댓글 삭제"""
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.user:
