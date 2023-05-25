@@ -54,6 +54,9 @@ class User(AbstractBaseUser):
     followings = models.ManyToManyField(
         "self", symmetrical=False, related_name="followers", blank=True
     )
+    '''
+    symmetrical : 대칭여부설정 Ture라면 자동 맞팔, False라면 한쪽만 팔로우
+    '''
     LOGIN_TYPES = [
         ("normal", "일반"),
         ("kakao", "카카오"),
