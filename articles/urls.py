@@ -18,4 +18,5 @@ urlpatterns = [
     path(
         "bookmark/<int:article_id>/", views.BookmarkView.as_view(), name="bookmark_view"
     ),
+    path("search/<str:query>/", views.SearchView.as_view(), name="search_view"),
 ]
