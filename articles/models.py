@@ -21,7 +21,7 @@ class Comment(models.Model):
         Article, on_delete=models.CASCADE, related_name="comments"
     )
     comment = models.TextField()
-    like = models.ManyToManyField(User, blank=True, verbose_name="좋아요", related_name="like_posts")
+    like = models.ManyToManyField(User, blank=True, verbose_name="좋아요", related_name="like_comments")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
