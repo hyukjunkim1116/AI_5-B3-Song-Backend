@@ -16,10 +16,8 @@ from rest_framework.generics import get_object_or_404
 from users.serializers import UserSerializer
 from users.models import User
 from articles.models import Article, Comment
-from articles.serializers import ArticleListSerializer,CommentSerializer
+from articles.serializers import ArticleListSerializer, CommentSerializer
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-
-
 
 
 class UserView(APIView):
@@ -128,6 +126,7 @@ class ProfileAticlesView(APIView):
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class ProfileLikesView(APIView):
     def get(self, request, user_id):
         """유저 프로필 좋아요 조회"""
@@ -135,18 +134,17 @@ class ProfileLikesView(APIView):
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class ProfileBookmarksView(APIView):
     def get(self, request, user_id):
         """유저 프로필 북마크 조회"""
         user_articles = Article.objects.filter(bookmark=user_id)
-        serializer = ArticleListSerializer(user_articles,many=True)
+        serializer = ArticleListSerializer(user_articles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-
-
 class KakaoLogin(APIView):
-    """카카오 로그인"""
+    """카카오 소셜 로그인"""
 
     def get(self, request):
         return Response(KAKAO_REST_API_KEY, status=status.HTTP_200_OK)
@@ -174,39 +172,19 @@ class KakaoLogin(APIView):
             },
         )
         user_data = user_data.json()
-        avatar = user_data.get("properties")["profile_image"]
-        email = user_data.get("kakao_account")["email"]
-        nickname = user_data.get("properties")["nickname"]
-        gender = user_data.get("properties")["gender"]
+        data = {
+            "avatar": user_data.get("properties").get("profile_image"),
+            "email": user_data.get("kakao_account").get("email"),
+            "nickname": user_data.get("properties").get("nickname"),
+            "gender": user_data.get("properties").get("gender"),
+            "login_type": "kakao",
+        }
+        return SocialLogin(**data)
 
-        try:
-            user = User.objects.get(email=email)
-            if user.login_type == "kakao":
-                refresh = RefreshToken.for_user(user)
-                return Response(
-                    {"refresh": str(refresh), "access": str(refresh.access_token)},
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                return Response(user.login_type, status=status.HTTP_400_BAD_REQUEST)
-
-        except User.DoesNotExist:
-            new_user = User.objects.create(
-                avatar=avatar,
-                nickname=nickname,
-                email=email,
-                login_type="kakao",
-                gender=gender,
-            )
-            new_user.set_unusable_password()
-            new_user.save()
-            refresh = RefreshToken.for_user(new_user)
-            return Response(
-                {"refresh": str(refresh), "access": str(refresh.access_token)},
-                status=status.HTTP_200_OK,
-            )
 
 class GoogleLogin(APIView):
+    """구글 소셜 로그인"""
+
     def get(self, request):
         return Response(GOOGLE_API_KEY, status=status.HTTP_200_OK)
 
@@ -217,39 +195,18 @@ class GoogleLogin(APIView):
             headers={"Authorization": f"Bearer {access_token}"},
         )
         user_data = user_data.json()
-        print(user_data)
-        avatar = user_data.get("picture")
-        nickname = user_data.get("name")
-        email = user_data.get("email")
-
-        try:
-            user = User.objects.get(email=email)
-            if user.login_type == "google":
-                refresh = RefreshToken.for_user(user)
-                return Response(
-                    {"refresh": str(refresh), "access": str(refresh.access_token)},
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                return Response(user.login_type, status=status.HTTP_400_BAD_REQUEST)
-
-        except User.DoesNotExist:
-            new_user = User.objects.create(
-                avatar=avatar,
-                nickname=nickname,
-                email=email,
-                login_type="google",
-            )
-            new_user.set_unusable_password()
-            new_user.save()
-            refresh = RefreshToken.for_user(new_user)
-            return Response(
-                {"refresh": str(refresh), "access": str(refresh.access_token)},
-                status=status.HTTP_200_OK,
-            )
+        data = {
+            "avatar": user_data.get("picture"),
+            "email": user_data.get("email"),
+            "nickname": user_data.get("name"),
+            "login_type": "google",
+        }
+        return SocialLogin(**data)
 
 
 class NaverLogin(APIView):
+    """네이버 소셜 로그인"""
+
     def get(self, request):
         return Response(NAVER_API_KEY, status=status.HTTP_200_OK)
 
@@ -269,34 +226,47 @@ class NaverLogin(APIView):
             },
         )
         user_data = user_data.json().get("response")
-        avatar = user_data.get("profile_image")
-        nickname = user_data.get("nickname")
-        email = user_data.get("email")
-        gender = user_data.get("gender")
+        data = {
+            "avatar": user_data.get("profile_image"),
+            "email": user_data.get("email"),
+            "nickname": user_data.get("nickname"),
+            "login_type": "naver",
+        }
+        return SocialLogin(**data)
 
-        try:
-            user = User.objects.get(email=email)
-            if user.login_type == "naver":
-                refresh = RefreshToken.for_user(user)
-                return Response(
-                    {"refresh": str(refresh), "access": str(refresh.access_token)},
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                return Response(user.login_type, status=status.HTTP_400_BAD_REQUEST)
 
-        except User.DoesNotExist:
-            new_user = User.objects.create(
-                avatar=avatar,
-                nickname=nickname,
-                email=email,
-                login_type="naver",
-                gender=gender,
-            )
-            new_user.set_unusable_password()
-            new_user.save()
-            refresh = RefreshToken.for_user(new_user)
+def SocialLogin(**kwargs):
+    """소셜 로그인, 회원가입"""
+    # 각각 소셜 로그인에서 email, nickname, login_type등을 받아옴!!
+    data = {k: v for k, v in kwargs.items() if v is not None}
+    # none인 값들은 빼줌
+    email = data.get("email")
+    login_type = data.get("login_type")
+    # 그 중 email이 없으면 회원가입이 불가능하므로
+    # 프론트에서 메시지를 띄워주고, 다시 로그인 페이지로 이동시키기
+    if not email:
+        return Response({"error": "no_email"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        user = User.objects.get(email=email)
+        # 로그인 타입까지 같으면, 토큰 발행해서 프론트로 보내주기
+        if login_type == user.login_type:
+            refresh = RefreshToken.for_user(user)
             return Response(
                 {"refresh": str(refresh), "access": str(refresh.access_token)},
                 status=status.HTTP_200_OK,
             )
+        # 유저의 다른 소셜계정으로 로그인한 유저라면, 해당 로그인 타입을 보내줌.
+        # (프론트에서 "{login_type}으로 로그인한 계정이 있습니다!" alert 띄워주기)
+        else:
+            return Response(user.login_type, status=status.HTTP_400_BAD_REQUEST)
+    # 유저가 존재하지 않는다면 회원가입시키기
+    except User.DoesNotExist:
+        new_user = User.objects.create(**data)
+        # pw는 사용불가로 지정
+        new_user.set_unusable_password()
+        new_user.save()
+        refresh = RefreshToken.for_user(new_user)
+        return Response(
+            {"refresh": str(refresh), "access": str(refresh.access_token)},
+            status=status.HTTP_200_OK,
+        )
