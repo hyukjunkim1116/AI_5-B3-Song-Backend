@@ -65,35 +65,35 @@ class Articles(APIView):
     #             status=HTTP_400_BAD_REQUEST,
     #         )
 
-    def post(self, request):
-        serializer = ArticleDetailSerializer(data=request.data)
+    # def post(self, request):
+    #     serializer = ArticleDetailSerializer(data=request.data)
 
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+    #     if not serializer.is_valid():
+    #         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        try:
-            article = serializer.save(owner=request.user)
-            content = request.data["content"]
+    #     try:
+    #         article = serializer.save(owner=request.user)
+    #         content = request.data["content"]
 
-            recommendation, youtube_link = recommend_music_and_link(content)
-            link_comment = f"이런 영상(음악) 어떠세요? {recommendation} - {youtube_link}"
+    #         recommendation, youtube_link = recommend_music_and_link(content)
+    #         link_comment = f"이런 영상(음악) 어떠세요? {recommendation} - {youtube_link}"
 
-            serializer = ArticleDetailSerializer(article)
+    #         serializer = ArticleDetailSerializer(article)
 
-            url = f"{settings.API_BASE_URL}/articles/{article.id}/comments/"
-            data = {"comment": link_comment}
-            headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
-            response = requests.post(url, json=data, headers=headers)
+    #         url = f"{settings.API_BASE_URL}/articles/{article.id}/comments/"
+    #         data = {"comment": link_comment}
+    #         headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
+    #         response = requests.post(url, json=data, headers=headers)
 
-            if response.status_code != status.HTTP_200_OK:
-                print(
-                    "포스팅 오류",
-                    response.status_code,
-                )
+    #         if response.status_code != status.HTTP_200_OK:
+    #             print(
+    #                 "포스팅 오류",
+    #                 response.status_code,
+    #             )
 
-            return Response(serializer.data)
-        except Exception as e:
-            return JsonResponse({"detail": str(e)}, status=500)
+    #         return Response(serializer.data)
+    #     except Exception as e:
+    #         return JsonResponse({"detail": str(e)}, status=500)
 
 
 class ArticleDetail(APIView):
