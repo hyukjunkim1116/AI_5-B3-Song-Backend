@@ -16,10 +16,8 @@ from rest_framework.generics import get_object_or_404
 from users.serializers import UserSerializer
 from users.models import User
 from articles.models import Article, Comment
-from articles.serializers import ArticleListSerializer,CommentSerializer
+from articles.serializers import ArticleListSerializer, CommentSerializer
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-
-
 
 
 class UserView(APIView):
@@ -128,6 +126,7 @@ class ProfileAticlesView(APIView):
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class ProfileLikesView(APIView):
     def get(self, request, user_id):
         """유저 프로필 좋아요 조회"""
@@ -135,12 +134,14 @@ class ProfileLikesView(APIView):
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class ProfileBookmarksView(APIView):
     def get(self, request, user_id):
         """유저 프로필 북마크 조회"""
         user_articles = Article.objects.filter(bookmark=user_id)
-        serializer = ArticleListSerializer(user_articles,many=True)
+        serializer = ArticleListSerializer(user_articles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class FollowView(APIView):
     def get(self, request, user_id):
@@ -161,8 +162,6 @@ class FollowView(APIView):
                 return Response("follow", status=status.HTTP_200_OK)
         else:
             return Response("자신을 팔로우 할 수 없습니다!", status=status.HTTP_403_FORBIDDEN)
-
-
 
 
 class KakaoLogin(APIView):
@@ -225,6 +224,7 @@ class KakaoLogin(APIView):
                 {"refresh": str(refresh), "access": str(refresh.access_token)},
                 status=status.HTTP_200_OK,
             )
+
 
 class GoogleLogin(APIView):
     def get(self, request):
