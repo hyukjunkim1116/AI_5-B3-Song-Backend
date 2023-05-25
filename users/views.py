@@ -207,6 +207,7 @@ class KakaoLogin(APIView):
         return SocialLogin(**data)
 
 
+
 class GoogleLogin(APIView):
     """구글 소셜 로그인"""
 

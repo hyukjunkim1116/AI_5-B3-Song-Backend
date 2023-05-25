@@ -51,6 +51,7 @@ class Articles(APIView):
     def post(self, request):
         serializer = ArticleDetailSerializer(
             data=request.data,
+            # context={"request": request},
         )
         if serializer.is_valid():
             try:
