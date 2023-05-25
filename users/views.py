@@ -142,6 +142,26 @@ class ProfileBookmarksView(APIView):
         serializer = ArticleListSerializer(user_articles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class FollowView(APIView):
+    def get(self, request, user_id):
+        """유저 팔로우한 유저들 조회"""
+        follow = User.objects.filter(followings=user_id)
+        serializer = UserSerializer(follow, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, user_id):
+        """유저 팔로잉 누르기"""
+        if request.user.id != user_id:
+            user = get_object_or_404(User, id=user_id)
+            if request.user in user.followings.all():
+                user.followings.remove(request.user)
+                return Response("unfollow", status=status.HTTP_200_OK)
+            else:
+                user.followings.add(request.user)
+                return Response("follow", status=status.HTTP_200_OK)
+        else:
+            return Response("자신을 팔로우 할 수 없습니다!", status=status.HTTP_403_FORBIDDEN)
+
 
 ############################ 소셜 로그인 ############################
 # 각각의 get 메소드는 프론트에 api key를 전달하기 위한 메소드입니다.
