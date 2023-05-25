@@ -195,3 +195,5 @@ CORS_ALLOW_HEADERS = (
 )
 
 AUTH_USER_MODEL = "users.User"
+
+API_BASE_URL = "http://127.0.0.1:8000/api"

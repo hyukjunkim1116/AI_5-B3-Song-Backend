@@ -3,7 +3,11 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.status import (
+    HTTP_204_NO_CONTENT,
+    HTTP_200_OK,
+    HTTP_400_BAD_REQUEST,
+)
 from rest_framework.exceptions import (
     NotFound,
     NotAuthenticated,
@@ -17,11 +21,23 @@ from .serializers import (
     CommentCreateSerializer,
     PhotoSerializer,
 )
+
+from django.http import JsonResponse
 from .models import Article, Comment
+
+from django.conf import settings
+import requests
+from .openai_utility import get_music_recommendation
 
 
 class Articles(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def handleError(self, request, exception):
+        """
+        Handle the error and return the proper Response.
+        """
+        return JsonResponse({"detail": str(exception)}, status=500)
 
     def get(self, request):
         all_articles = Article.objects.all().order_by("-created_at")
@@ -48,6 +64,44 @@ class Articles(APIView):
                 serializer.errors,
                 status=HTTP_400_BAD_REQUEST,
             )
+
+    # 작성시 openai로 게시글 내용을 전달하는 함수.
+    # def post(self, request):
+    #     serializer = ArticleDetailSerializer(
+    #         data=request.data,
+    #     )
+    #     if serializer.is_valid():
+    #         try:
+    #             article = serializer.save(owner=request.user)
+    #             content = request.data["content"]
+    #             recommendation = get_music_recommendation(content)
+
+    #             # recommendation를 데이터베이스에 저장하거나 응답으로 반환할 수 있습니다.
+    #             serializer = ArticleDetailSerializer(article)
+
+    #             # Post the recommendation comment to CommentsView
+    #             url = f"{settings.API_BASE_URL}/articles/{article.id}/comments/"
+    #             print(url)
+    #             data = {"comment": recommendation}
+    #             print(data)
+    #             headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
+    #             print(headers)
+
+    #             response = requests.post(url, json=data, headers=headers)
+
+    #             # Check if POST request is successful
+    #             if response.status_code == status.HTTP_200_OK:
+    #                 print("Recommendation comment posted successfully")
+    #             else:
+    #                 print(
+    #                     "Error in posting recommendation comment", response.status_code
+    #                 )
+
+    #             return Response(serializer.data)
+    #         except Exception as e:
+    #             return self.handleError(request, e)
+    #     else:
+    #         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 class ArticleDetail(APIView):
@@ -140,7 +194,7 @@ class CommentsView(APIView):
 
 
 class CommentsDetailView(APIView):
-    def put(self, request, comment_id):
+    def put(self, request, article_id, comment_id):
         """댓글 수정"""
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.user:
@@ -153,7 +207,7 @@ class CommentsDetailView(APIView):
         else:
             return Response("권한이 없습니다!", status=status.HTTP_403_FORBIDDEN)
 
-    def delete(self, request, comment_id):
+    def delete(self, request, article_id, comment_id):
         """댓글 삭제"""
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.user:
@@ -173,8 +227,8 @@ class LikeView(APIView):
         else:
             comment.like.add(request.user)
             return Response("like", status=status.HTTP_200_OK)
-        
-        
+
+          
 class BookmarkView(APIView):
     def post(self, request, article_id):
         """게시글 북마크 하기"""
