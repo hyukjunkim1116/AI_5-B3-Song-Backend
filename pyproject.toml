@@ -11,10 +11,10 @@ python = "^3.11"
 djangorestframework = "^3.14.0"
 djangorestframework-simplejwt = "^5.2.2"
 black = "^23.3.0"
-pillow = "^9.5.0"
 django-cors-headers = "^4.0.0"
 mysqlclient = "^2.1.1"
 requests = "^2.31.0"
+openai = "^0.27.7"
 
 
 [build-system]
