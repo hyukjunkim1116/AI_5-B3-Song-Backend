@@ -276,7 +276,7 @@ class NaverLogin(APIView):
 
         try:
             user = User.objects.get(email=email)
-            if user.login_type == "google":
+            if user.login_type == "naver":
                 refresh = RefreshToken.for_user(user)
                 return Response(
                     {"refresh": str(refresh), "access": str(refresh.access_token)},
@@ -290,7 +290,7 @@ class NaverLogin(APIView):
                 avatar=avatar,
                 nickname=nickname,
                 email=email,
-                login_type="google",
+                login_type="naver",
                 gender=gender,
             )
             new_user.set_unusable_password()
