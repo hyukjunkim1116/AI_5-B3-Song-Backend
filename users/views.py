@@ -1,6 +1,11 @@
 import requests
 from django.shortcuts import redirect
-from my_settings import KAKAO_REST_API_KEY
+from my_settings import (
+    KAKAO_REST_API_KEY,
+    GOOGLE_API_KEY,
+    NAVER_API_KEY,
+    NAVER_SECRET_KEY,
+)
 from medias.serializers import PhotoSerializer, UserPhotoSerializer
 from rest_framework import status
 from rest_framework.views import APIView
@@ -28,12 +33,13 @@ class UserView(APIView):
             return Response(
                 {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST
             )
-    
+
     def get(self, request):
         """유저전체보기"""
         user = User.objects.all()
         serialize = UserSerializer(user, many=True)
         return Response(serialize.data, status=status.HTTP_200_OK)
+
 
 class UserPhotoView(APIView):
     permission_classes = [IsAuthenticated]
@@ -55,7 +61,6 @@ class UserPhotoView(APIView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
-    
 
 
 class ProfileView(APIView):
@@ -97,11 +102,15 @@ class ProfileView(APIView):
             if user.is_active:
                 user.is_active = False
                 user.save()
-                return Response(f"{user.email}이 휴면계정이 되었습니다!", status=status.HTTP_204_NO_CONTENT)
+                return Response(
+                    f"{user.email}이 휴면계정이 되었습니다!", status=status.HTTP_204_NO_CONTENT
+                )
             else:
                 user.is_active = True
                 user.save()
-                return Response(f"{user.email}계정이 활성화 되었습니다!", status=status.HTTP_204_NO_CONTENT)
+                return Response(
+                    f"{user.email}계정이 활성화 되었습니다!", status=status.HTTP_204_NO_CONTENT
+                )
         else:
             return Response("권한이 없습니다!", status=status.HTTP_403_FORBIDDEN)
 
@@ -137,11 +146,12 @@ class ProfileBookmarksView(APIView):
 
 
 class KakaoLogin(APIView):
+    """카카오 로그인"""
+
     def get(self, request):
         return Response(KAKAO_REST_API_KEY, status=status.HTTP_200_OK)
 
     def post(self, request):
-        """카카오 로그인"""
         auth_code = request.data.get("code")
         kakao_token_api = "https://kauth.kakao.com/oauth/token"
         data = {
@@ -164,12 +174,13 @@ class KakaoLogin(APIView):
             },
         )
         user_data = user_data.json()
-        kakao_email = user_data.get("kakao_account")["email"]
-        kakao_nickname = user_data.get("properties")["nickname"]
-        kakao_profile_image = user_data.get("properties")["profile_image"]
+        avatar = user_data.get("properties")["profile_image"]
+        email = user_data.get("kakao_account")["email"]
+        nickname = user_data.get("properties")["nickname"]
+        gender = user_data.get("properties")["gender"]
 
         try:
-            user = User.objects.get(email=kakao_email)
+            user = User.objects.get(email=email)
             if user.login_type == "kakao":
                 refresh = RefreshToken.for_user(user)
                 return Response(
@@ -181,10 +192,11 @@ class KakaoLogin(APIView):
 
         except User.DoesNotExist:
             new_user = User.objects.create(
-                avatar=kakao_profile_image,
-                nickname=kakao_nickname,
-                email=kakao_email,
+                avatar=avatar,
+                nickname=nickname,
+                email=email,
                 login_type="kakao",
+                gender=gender,
             )
             new_user.set_unusable_password()
             new_user.save()
@@ -193,4 +205,98 @@ class KakaoLogin(APIView):
                 {"refresh": str(refresh), "access": str(refresh.access_token)},
                 status=status.HTTP_200_OK,
             )
-    
+
+class GoogleLogin(APIView):
+    def get(self, request):
+        return Response(GOOGLE_API_KEY, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        access_token = request.data["access_token"]
+        user_data = requests.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        user_data = user_data.json()
+        print(user_data)
+        avatar = user_data.get("picture")
+        nickname = user_data.get("name")
+        email = user_data.get("email")
+
+        try:
+            user = User.objects.get(email=email)
+            if user.login_type == "google":
+                refresh = RefreshToken.for_user(user)
+                return Response(
+                    {"refresh": str(refresh), "access": str(refresh.access_token)},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(user.login_type, status=status.HTTP_400_BAD_REQUEST)
+
+        except User.DoesNotExist:
+            new_user = User.objects.create(
+                avatar=avatar,
+                nickname=nickname,
+                email=email,
+                login_type="google",
+            )
+            new_user.set_unusable_password()
+            new_user.save()
+            refresh = RefreshToken.for_user(new_user)
+            return Response(
+                {"refresh": str(refresh), "access": str(refresh.access_token)},
+                status=status.HTTP_200_OK,
+            )
+
+
+class NaverLogin(APIView):
+    def get(self, request):
+        return Response(NAVER_API_KEY, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        code = request.data.get("naver_code")
+        state = request.data.get("state")
+        access_token = requests.post(
+            f"https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&code={code}&client_id={NAVER_API_KEY}&client_secret={NAVER_SECRET_KEY}&state={state}",
+            headers={"Accept": "application/json"},
+        )
+        access_token = access_token.json().get("access_token")
+        user_data = requests.get(
+            "https://openapi.naver.com/v1/nid/me",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Accept": "application/json",
+            },
+        )
+        user_data = user_data.json().get("response")
+        avatar = user_data.get("profile_image")
+        nickname = user_data.get("nickname")
+        email = user_data.get("email")
+        gender = user_data.get("gender")
+
+        try:
+            user = User.objects.get(email=email)
+            if user.login_type == "google":
+                refresh = RefreshToken.for_user(user)
+                return Response(
+                    {"refresh": str(refresh), "access": str(refresh.access_token)},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(user.login_type, status=status.HTTP_400_BAD_REQUEST)
+
+        except User.DoesNotExist:
+            new_user = User.objects.create(
+                avatar=avatar,
+                nickname=nickname,
+                email=email,
+                login_type="google",
+                gender=gender,
+            )
+            new_user.set_unusable_password()
+            new_user.save()
+            refresh = RefreshToken.for_user(new_user)
+            return Response(
+                {"refresh": str(refresh), "access": str(refresh.access_token)},
+                status=status.HTTP_200_OK,
+            )
