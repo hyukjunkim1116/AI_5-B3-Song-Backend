@@ -22,12 +22,16 @@ from .serializers import (
     PhotoSerializer,
 )
 
+from django.db.models.query_utils import Q
+
 from django.http import JsonResponse
 from .models import Article, Comment
 
 from django.conf import settings
 import requests
 from .openai_utility import get_music_recommendation
+
+import urllib
 
 
 class Articles(APIView):
@@ -239,3 +243,14 @@ class BookmarkView(APIView):
         else:
             article.bookmark.add(request.user)
             return Response("bookmark", status=status.HTTP_200_OK)
+
+
+class SearchView(APIView):
+    def get(self, request, query):
+        decoded_query = urllib.parse.unquote(query)
+        articles = Article.objects.filter(Q(title__contains=decoded_query) | Q(content__contains=decoded_query))
+        serializer = ArticleListSerializer(articles, many=True)
+        if articles:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response("검색 결과가 없습니다", status=status.HTTP_204_NO_CONTENT)
