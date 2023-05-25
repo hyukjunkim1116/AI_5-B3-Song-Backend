@@ -12,4 +12,5 @@ urlpatterns = [
     path("profile/<int:user_id>/", views.ProfileView.as_view(), name="profile_view"),
     path("<int:user_id>/photos/", views.UserPhotoView.as_view()),
     path("kakao/", views.KakaoLogin.as_view(), name="kakao_login"),
+    path("google/", views.GoogleLogin.as_view(), name="google_login"),
 ]

@@ -1,6 +1,6 @@
 import requests
 from django.shortcuts import redirect
-from my_settings import KAKAO_REST_API_KEY
+from my_settings import KAKAO_REST_API_KEY, GOOGLE_API_KEY
 from medias.serializers import PhotoSerializer, UserPhotoSerializer
 from rest_framework import status
 from rest_framework.views import APIView
@@ -57,11 +57,12 @@ class ProfileView(APIView):
 
 
 class KakaoLogin(APIView):
+    """카카오 로그인"""
+
     def get(self, request):
         return Response(KAKAO_REST_API_KEY, status=status.HTTP_200_OK)
 
     def post(self, request):
-        """카카오 로그인"""
         auth_code = request.data.get("code")
         kakao_token_api = "https://kauth.kakao.com/oauth/token"
         data = {
@@ -84,12 +85,13 @@ class KakaoLogin(APIView):
             },
         )
         user_data = user_data.json()
-        kakao_email = user_data.get("kakao_account")["email"]
-        kakao_nickname = user_data.get("properties")["nickname"]
-        kakao_profile_image = user_data.get("properties")["profile_image"]
+        avatar = user_data.get("properties")["profile_image"]
+        email = user_data.get("kakao_account")["email"]
+        nickname = user_data.get("properties")["nickname"]
+        gender = user_data.get("properties")["gender"]
 
         try:
-            user = User.objects.get(email=kakao_email)
+            user = User.objects.get(email=email)
             if user.login_type == "kakao":
                 refresh = RefreshToken.for_user(user)
                 return Response(
@@ -101,10 +103,54 @@ class KakaoLogin(APIView):
 
         except User.DoesNotExist:
             new_user = User.objects.create(
-                avatar=kakao_profile_image,
-                nickname=kakao_nickname,
-                email=kakao_email,
+                avatar=avatar,
+                nickname=nickname,
+                email=email,
                 login_type="kakao",
+                gender=gender,
+            )
+            new_user.set_unusable_password()
+            new_user.save()
+            refresh = RefreshToken.for_user(new_user)
+            return Response(
+                {"refresh": str(refresh), "access": str(refresh.access_token)},
+                status=status.HTTP_200_OK,
+            )
+
+
+class GoogleLogin(APIView):
+    def get(self, request):
+        return Response(GOOGLE_API_KEY, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        access_token = request.data["access_token"]
+        user_data = requests.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        user_data = user_data.json()
+        print(user_data)
+        avatar = user_data.get("picture")
+        nickname = user_data.get("name")
+        email = user_data.get("email")
+
+        try:
+            user = User.objects.get(email=email)
+            if user.login_type == "google":
+                refresh = RefreshToken.for_user(user)
+                return Response(
+                    {"refresh": str(refresh), "access": str(refresh.access_token)},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(user.login_type, status=status.HTTP_400_BAD_REQUEST)
+
+        except User.DoesNotExist:
+            new_user = User.objects.create(
+                avatar=avatar,
+                nickname=nickname,
+                email=email,
+                login_type="google",
             )
             new_user.set_unusable_password()
             new_user.save()
