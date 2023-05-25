@@ -27,7 +27,7 @@ from .models import Article, Comment
 
 from django.conf import settings
 import requests
-from .openai_utility import get_music_recommendation
+from .openai_utility import recommend_music_and_link
 
 
 class Articles(APIView):
@@ -48,24 +48,6 @@ class Articles(APIView):
         )
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = ArticleDetailSerializer(
-            data=request.data,
-        )
-        if serializer.is_valid():
-            try:
-                article = serializer.save(owner=request.user)
-                serializer = ArticleDetailSerializer(article)
-                return Response(serializer.data)
-            except Exception as e:
-                print(e)
-        else:
-            return Response(
-                serializer.errors,
-                status=HTTP_400_BAD_REQUEST,
-            )
-
-    # 작성시 openai로 게시글 내용을 전달하는 함수.
     # def post(self, request):
     #     serializer = ArticleDetailSerializer(
     #         data=request.data,
@@ -73,35 +55,45 @@ class Articles(APIView):
     #     if serializer.is_valid():
     #         try:
     #             article = serializer.save(owner=request.user)
-    #             content = request.data["content"]
-    #             recommendation = get_music_recommendation(content)
-
-    #             # recommendation를 데이터베이스에 저장하거나 응답으로 반환할 수 있습니다.
     #             serializer = ArticleDetailSerializer(article)
-
-    #             # Post the recommendation comment to CommentsView
-    #             url = f"{settings.API_BASE_URL}/articles/{article.id}/comments/"
-    #             print(url)
-    #             data = {"comment": recommendation}
-    #             print(data)
-    #             headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
-    #             print(headers)
-
-    #             response = requests.post(url, json=data, headers=headers)
-
-    #             # Check if POST request is successful
-    #             if response.status_code == status.HTTP_200_OK:
-    #                 print("Recommendation comment posted successfully")
-    #             else:
-    #                 print(
-    #                     "Error in posting recommendation comment", response.status_code
-    #                 )
-
     #             return Response(serializer.data)
     #         except Exception as e:
-    #             return self.handleError(request, e)
+    #             print(e)
     #     else:
-    #         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+    #         return Response(
+    #             serializer.errors,
+    #             status=HTTP_400_BAD_REQUEST,
+    #         )
+
+    def post(self, request):
+        serializer = ArticleDetailSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        try:
+            article = serializer.save(owner=request.user)
+            content = request.data["content"]
+
+            recommendation, youtube_link = recommend_music_and_link(content)
+            link_comment = f"이런 영상(음악) 어떠세요? {recommendation} - {youtube_link}"
+
+            serializer = ArticleDetailSerializer(article)
+
+            url = f"{settings.API_BASE_URL}/articles/{article.id}/comments/"
+            data = {"comment": link_comment}
+            headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
+            response = requests.post(url, json=data, headers=headers)
+
+            if response.status_code != status.HTTP_200_OK:
+                print(
+                    "포스팅 오류",
+                    response.status_code,
+                )
+
+            return Response(serializer.data)
+        except Exception as e:
+            return JsonResponse({"detail": str(e)}, status=500)
 
 
 class ArticleDetail(APIView):
@@ -228,7 +220,7 @@ class LikeView(APIView):
             comment.like.add(request.user)
             return Response("like", status=status.HTTP_200_OK)
 
-          
+
 class BookmarkView(APIView):
     def post(self, request, article_id):
         """게시글 북마크 하기"""
