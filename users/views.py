@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.generics import get_object_or_404
 from users.serializers import UserSerializer
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from users.models import User
 from articles.models import Article, Comment
 from articles.serializers import ArticleListSerializer,CommentSerializer
@@ -34,6 +35,7 @@ class UserView(APIView):
         user = User.objects.all()
         serialize = UserSerializer(user, many=True)
         return Response(serialize.data, status=status.HTTP_200_OK)
+
 
 class UserPhotoView(APIView):
     permission_classes = [IsAuthenticated]
