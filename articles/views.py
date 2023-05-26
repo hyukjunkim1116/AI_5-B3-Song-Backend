@@ -247,10 +247,12 @@ class BookmarkView(APIView):
 class SearchView(APIView):
     def get(self, request, query):
         """검색하기
-        
+
         제목이나 내용에 입력한 검색어가 포함되어 있는 게시글들을 가져옴"""
         decoded_query = urllib.parse.unquote(query)
-        articles = Article.objects.filter(Q(title__contains=decoded_query) | Q(content__contains=decoded_query))
+        articles = Article.objects.filter(
+            Q(title__contains=decoded_query) | Q(content__contains=decoded_query)
+        )
         serializer = ArticleListSerializer(articles, many=True)
         if articles:
             return Response(serializer.data, status=status.HTTP_200_OK)
