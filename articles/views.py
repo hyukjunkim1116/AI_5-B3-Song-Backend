@@ -53,54 +53,54 @@ class Articles(APIView):
         )
         return Response(serializer.data)
 
-    def post(self, request):
-        """게시글 작성하기"""
-        serializer = ArticleDetailSerializer(
-            data=request.data,
-            # context={"request": request},
-        )
-        if serializer.is_valid():
-            try:
-                article = serializer.save(owner=request.user)
-                serializer = ArticleDetailSerializer(article)
-                return Response(serializer.data)
-            except Exception as e:
-                print(e)
-        else:
-            return Response(
-                serializer.errors,
-                status=HTTP_400_BAD_REQUEST,
-            )
-
     # def post(self, request):
-    #     serializer = ArticleDetailSerializer(data=request.data)
+    #     """게시글 작성하기"""
+    #     serializer = ArticleDetailSerializer(
+    #         data=request.data,
+    #         # context={"request": request},
+    #     )
+    #     if serializer.is_valid():
+    #         try:
+    #             article = serializer.save(owner=request.user)
+    #             serializer = ArticleDetailSerializer(article)
+    #             return Response(serializer.data)
+    #         except Exception as e:
+    #             print(e)
+    #     else:
+    #         return Response(
+    #             serializer.errors,
+    #             status=HTTP_400_BAD_REQUEST,
+    #         )
 
-    #     if not serializer.is_valid():
-    #         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        serializer = ArticleDetailSerializer(data=request.data)
 
-    #     try:
-    #         article = serializer.save(owner=request.user)
-    #         content = request.data["content"]
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-    #         recommendation, youtube_link = recommend_music_and_link(content)
-    #         link_comment = f"이런 영상(음악) 어떠세요? {recommendation} - {youtube_link}"
+        try:
+            article = serializer.save(owner=request.user)
+            content = request.data["content"]
 
-    #         serializer = ArticleDetailSerializer(article)
+            recommendation, youtube_link = recommend_music_and_link(content)
+            link_comment = f"이런 음악 어떠세요?\n{recommendation} - {youtube_link}"
 
-    #         url = f"{settings.API_BASE_URL}/articles/{article.id}/comments/"
-    #         data = {"comment": link_comment}
-    #         headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
-    #         response = requests.post(url, json=data, headers=headers)
+            serializer = ArticleDetailSerializer(article)
 
-    #         if response.status_code != status.HTTP_200_OK:
-    #             print(
-    #                 "포스팅 오류",
-    #                 response.status_code,
-    #             )
+            url = f"{settings.API_BASE_URL}/articles/{article.id}/comments/"
+            data = {"comment": link_comment}
+            headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
+            response = requests.post(url, json=data, headers=headers)
 
-    #         return Response(serializer.data)
-    #     except Exception as e:
-    #         return JsonResponse({"detail": str(e)}, status=500)
+            if response.status_code != status.HTTP_200_OK:
+                print(
+                    "포스팅 오류",
+                    response.status_code,
+                )
+
+            return Response(serializer.data)
+        except Exception as e:
+            return JsonResponse({"detail": str(e)}, status=500)
 
 
 class ArticleDetail(APIView):
@@ -197,7 +197,7 @@ class CommentsView(APIView):
 
 
 class CommentsDetailView(APIView):
-    def put(self, request, article_id, comment_id):
+    def put(self, request, comment_id):
         """댓글 수정"""
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.user:
@@ -210,7 +210,7 @@ class CommentsDetailView(APIView):
         else:
             return Response("권한이 없습니다!", status=status.HTTP_403_FORBIDDEN)
 
-    def delete(self, request, article_id, comment_id):
+    def delete(self, request, comment_id):
         """댓글 삭제"""
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.user:

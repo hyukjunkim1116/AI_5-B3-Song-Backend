@@ -6,7 +6,7 @@ from .models import Article, Comment
 
 class ArticleListSerializer(serializers.ModelSerializer):
     photos = PhotoSerializer(many=True, read_only=True)
-    created_at = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
     nickname = serializers.SerializerMethodField()
 
     def get_nickname(self, obj):
@@ -38,7 +38,7 @@ class CommentSerializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()
 
     def get_user(self, obj):
-        return obj.user.email
+        return obj.user.nickname
 
     def get_like_count(self, obj):
         return obj.like.count()
