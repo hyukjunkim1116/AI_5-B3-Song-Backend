@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.urls import reverse
 
@@ -37,7 +38,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     GENDERS = [
         ("M", "Male"),
         ("F", "Female"),
