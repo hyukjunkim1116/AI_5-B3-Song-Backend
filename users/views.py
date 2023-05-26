@@ -281,7 +281,7 @@ def SocialLogin(**kwargs):
             refresh = RefreshToken.for_user(user)
             access_token = CustomTokenObtainPairSerializer.get_token(user)
             return Response(
-                {"refresh": str(refresh), "access": str(access_token)},
+                {"refresh": str(refresh), "access": str(access_token.access_token)},
                 status=status.HTTP_200_OK,
             )
         # 유저의 다른 소셜계정으로 로그인한 유저라면, 해당 로그인 타입을 보내줌.
@@ -301,6 +301,6 @@ def SocialLogin(**kwargs):
         refresh = RefreshToken.for_user(new_user)
         access_token = CustomTokenObtainPairSerializer.get_token(user)
         return Response(
-            {"refresh": str(refresh), "access": str(refresh.access_token)},
+            {"refresh": str(refresh), "access": str(access_token.access_token)},
             status=status.HTTP_200_OK,
         )
