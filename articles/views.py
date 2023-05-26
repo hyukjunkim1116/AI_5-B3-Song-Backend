@@ -83,7 +83,7 @@ class Articles(APIView):
     #         content = request.data["content"]
 
     #         recommendation, youtube_link = recommend_music_and_link(content)
-    #         link_comment = f"이런 영상(음악) 어떠세요? {recommendation} - {youtube_link}"
+    #         link_comment = f"이런 음악 어떠세요?\n{recommendation} - {youtube_link}"
 
     #         serializer = ArticleDetailSerializer(article)
 
@@ -197,7 +197,7 @@ class CommentsView(APIView):
 
 
 class CommentsDetailView(APIView):
-    def put(self, request, article_id, comment_id):
+    def put(self, request, comment_id):
         """댓글 수정"""
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.user:
@@ -210,7 +210,7 @@ class CommentsDetailView(APIView):
         else:
             return Response("권한이 없습니다!", status=status.HTTP_403_FORBIDDEN)
 
-    def delete(self, request, article_id, comment_id):
+    def delete(self, request, comment_id):
         """댓글 삭제"""
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.user:
