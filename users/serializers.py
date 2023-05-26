@@ -6,9 +6,13 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 # 유저 생성관련 시리얼라이저
 class UserSerializer(serializers.ModelSerializer):
     like_comments = serializers.SerializerMethodField()
+    bookmarks = serializers.SerializerMethodField()
     
     def get_like_comments(self, obj):
         return list(obj.like_comments.values())
+    
+    def get_bookmarks(self, obj):
+        return list(obj.bookmarks.values())
     
     class Meta:
         model = User
