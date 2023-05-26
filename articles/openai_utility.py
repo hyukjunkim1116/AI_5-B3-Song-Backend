@@ -52,6 +52,7 @@ def get_youtube_music_link(song):
     request = youtube.search().list(
         part="id,snippet",
         type="video",
+        videoCategoryId="10",  # 추가 - 음악 카테고리만 해당
         q=song,
         videoDefinition="high",
         maxResults=1,
