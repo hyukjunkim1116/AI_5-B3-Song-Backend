@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.generics import get_object_or_404
-from users.serializers import UserSerializer
+from users.serializers import CustomTokenObtainPairSerializer, UserSerializer
 from users.models import User
 from articles.models import Article, Comment
 from articles.serializers import ArticleListSerializer, CommentSerializer
@@ -208,7 +208,6 @@ class KakaoLogin(APIView):
         return SocialLogin(**data)
 
 
-
 class GoogleLogin(APIView):
     """구글 소셜 로그인"""
 
@@ -280,8 +279,9 @@ def SocialLogin(**kwargs):
         # 로그인 타입까지 같으면, 토큰 발행해서 프론트로 보내주기
         if login_type == user.login_type:
             refresh = RefreshToken.for_user(user)
+            access_token = CustomTokenObtainPairSerializer.get_token(user)
             return Response(
-                {"refresh": str(refresh), "access": str(refresh.access_token)},
+                {"refresh": str(refresh), "access": str(access_token)},
                 status=status.HTTP_200_OK,
             )
         # 유저의 다른 소셜계정으로 로그인한 유저라면, 해당 로그인 타입을 보내줌.
@@ -299,6 +299,7 @@ def SocialLogin(**kwargs):
         new_user.save()
         # 이후 토큰 발급해서 프론트로
         refresh = RefreshToken.for_user(new_user)
+        access_token = CustomTokenObtainPairSerializer.get_token(user)
         return Response(
             {"refresh": str(refresh), "access": str(refresh.access_token)},
             status=status.HTTP_200_OK,
