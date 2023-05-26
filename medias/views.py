@@ -18,6 +18,7 @@ class PhotoDetail(APIView):
             raise NotFound
 
     def delete(self, request, pk):
+        """사진 삭제하기"""
         photo = self.get_object(pk)
         if photo.article and photo.article.owner != request.user:
             raise PermissionDenied
@@ -27,6 +28,7 @@ class PhotoDetail(APIView):
 
 class GetUploadURL(APIView):
     def post(self, request):
+        """업로드용 URL 가져오기"""
         url = f"https://api.cloudflare.com/client/v4/accounts/{settings.CF_ID}/images/v2/direct_upload"
         one_time_url = requests.post(
             url,
