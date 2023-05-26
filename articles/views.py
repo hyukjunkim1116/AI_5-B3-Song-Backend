@@ -197,6 +197,12 @@ class CommentsView(APIView):
 
 
 class CommentsDetailView(APIView):
+    def get(self, request, comment_id):
+        """특정 댓글 조회"""
+        comment = get_object_or_404(Comment, id=comment_id)
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
     def put(self, request, comment_id):
         """댓글 수정"""
         comment = get_object_or_404(Comment, id=comment_id)
