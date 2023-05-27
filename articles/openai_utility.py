@@ -7,6 +7,9 @@ from my_settings import OPENAI_API_KEY, YOUTUBE_API_KEY
 # GPT API 키 설정
 openai.api_key = OPENAI_API_KEY
 
+import requests
+from bs4 import BeautifulSoup
+
 
 def is_artist_first(text):
     if re.match(r"^[a-zA-Z가-힣\s]+[-]\s*", text):
@@ -62,9 +65,27 @@ def get_youtube_music_link(song):
     response = request.execute()
 
     if response["items"]:
-        return (
+        video_url = (
             f"https://www.youtube.com/watch?v={response['items'][0]['id']['videoId']}"
         )
+
+        html_doc = requests.get(video_url)
+        soup = BeautifulSoup(html_doc.text, "html.parser")
+        meta_tags = soup.find_all("meta")
+
+        og_title = None
+        og_url = None
+        for tag in meta_tags:
+            if "property" not in tag.attrs:
+                continue
+            if tag.attrs["property"] == "og:title":
+                og_title = tag.attrs["content"]
+            if tag.attrs["property"] == "og:url":
+                og_url = tag.attrs["content"]
+            if og_title is not None and og_url is not None:
+                break
+
+        return og_title, og_url
     else:
         return "찾을 수 없습니다."
 
