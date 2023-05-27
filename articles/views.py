@@ -53,53 +53,53 @@ class Articles(APIView):
         )
         return Response(serializer.data)
 
-    def post(self, request):
-        """게시글 작성하기"""
-        serializer = ArticleDetailSerializer(
-            data=request.data,
-            # context={"request": request},
-        )
-        if serializer.is_valid():
-            try:
-                article = serializer.save(owner=request.user)
-                serializer = ArticleDetailSerializer(article)
-                return Response(serializer.data)
-            except Exception as e:
-                print(e)
-        else:
-            return Response(
-                serializer.errors,
-                status=HTTP_400_BAD_REQUEST,
-            )
-
     # def post(self, request):
-    #     serializer = ArticleDetailSerializer(data=request.data)
+    #     """게시글 작성하기"""
+    #     serializer = ArticleDetailSerializer(
+    #         data=request.data,
+    #         # context={"request": request},
+    #     )
+    #     if serializer.is_valid():
+    #         try:
+    #             article = serializer.save(owner=request.user)
+    #             serializer = ArticleDetailSerializer(article)
+    #             return Response(serializer.data)
+    #         except Exception as e:
+    #             print(e)
+    #     else:
+    #         return Response(
+    #             serializer.errors,
+    #             status=HTTP_400_BAD_REQUEST,
+    # )
 
-    #     if not serializer.is_valid():
-    #         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        serializer = ArticleDetailSerializer(data=request.data)
 
-    #     try:
-    #         article = serializer.save(owner=request.user)
-    #         content = request.data["content"]
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-    #         recommendation, youtube_link = recommend_music_and_link(content)
-    #         link_comment = f"들려주신 사연을 듣고 어울릴만한 음악을 찾았어요! \n {youtube_link}"
-    #         serializer = ArticleDetailSerializer(article)
+        try:
+            article = serializer.save(owner=request.user)
+            content = request.data["content"]
 
-    #         url = f"{settings.API_BASE_URL}/articles/{article.id}/comments/"
-    #         data = {"comment": link_comment}
-    #         headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
-    #         response = requests.post(url, json=data, headers=headers)
-    #         print(response)
-    #         if response.status_code != status.HTTP_200_OK:
-    #             print(
-    #                 "포스팅 오류",
-    #                 response.status_code,
-    #             )
+            recommendation, youtube_link = recommend_music_and_link(content)
+            link_comment = f"들려주신 사연을 듣고 어울릴만한 음악을 찾았어요! \n {youtube_link}"
+            serializer = ArticleDetailSerializer(article)
 
-    #         return Response(serializer.data)
-    #     except Exception as e:
-    #         return JsonResponse({"detail": str(e)}, status=500)
+            url = f"{settings.API_BASE_URL}/articles/{article.id}/comments/"
+            data = {"comment": link_comment}
+            headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
+            response = requests.post(url, json=data, headers=headers)
+            print(response)
+            if response.status_code != status.HTTP_200_OK:
+                print(
+                    "포스팅 오류",
+                    response.status_code,
+                )
+
+            return Response(serializer.data)
+        except Exception as e:
+            return JsonResponse({"detail": str(e)}, status=500)
 
 
 class ArticleDetail(APIView):
