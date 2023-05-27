@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.generics import get_object_or_404
-from users.serializers import CustomTokenObtainPairSerializer, UserSerializer
+from users.serializers import CustomTokenObtainPairSerializer, UserSerializer, UserProfileSerializer
 from users.models import User
 from articles.models import Article, Comment
 from articles.serializers import ArticleListSerializer, CommentSerializer
@@ -35,8 +35,8 @@ class UserView(APIView):
     def get(self, request):
         """유저전체보기"""
         user = User.objects.all()
-        serialize = UserSerializer(user, many=True)
-        return Response(serialize.data, status=status.HTTP_200_OK)
+        serializer = UserProfileSerializer(user, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserPhotoView(APIView):
@@ -66,7 +66,7 @@ class ProfileView(APIView):
     def get(self, request, user_id):
         """유저 프로필 조회"""
         user = get_object_or_404(User, id=user_id)
-        serializer = UserSerializer(user)
+        serializer = UserProfileSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, user_id):
@@ -153,13 +153,14 @@ class FollowView(APIView):
 
     def post(self, request, user_id):
         """유저 팔로잉 누르기"""
+        you = get_object_or_404(User, id=user_id)
+        me = request.user
         if request.user.id != user_id:
-            user = get_object_or_404(User, id=user_id)
-            if request.user in user.followings.all():
-                user.followings.remove(request.user)
+            if me in you.followers.all():
+                you.followers.remove(me)
                 return Response("unfollow", status=status.HTTP_200_OK)
             else:
-                user.followings.add(request.user)
+                you.followers.add(me)
                 return Response("follow", status=status.HTTP_200_OK)
         else:
             return Response("자신을 팔로우 할 수 없습니다!", status=status.HTTP_403_FORBIDDEN)
