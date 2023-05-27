@@ -83,15 +83,14 @@ class Articles(APIView):
     #         content = request.data["content"]
 
     #         recommendation, youtube_link = recommend_music_and_link(content)
-    #         link_comment = f"이런 음악 어떠세요?\n{recommendation} - {youtube_link}"
-
+    #         link_comment = f"들려주신 사연을 듣고 어울릴만한 음악을 찾았어요! \n {youtube_link}"
     #         serializer = ArticleDetailSerializer(article)
 
     #         url = f"{settings.API_BASE_URL}/articles/{article.id}/comments/"
     #         data = {"comment": link_comment}
     #         headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
     #         response = requests.post(url, json=data, headers=headers)
-
+    #         print(response)
     #         if response.status_code != status.HTTP_200_OK:
     #             print(
     #                 "포스팅 오류",
@@ -202,7 +201,7 @@ class CommentsDetailView(APIView):
         comment = get_object_or_404(Comment, id=comment_id)
         serializer = CommentSerializer(comment)
         return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
     def put(self, request, comment_id):
         """댓글 수정"""
         comment = get_object_or_404(Comment, id=comment_id)
