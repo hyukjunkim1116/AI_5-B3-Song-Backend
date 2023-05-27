@@ -21,6 +21,7 @@ class ArticleListSerializer(serializers.ModelSerializer):
             "nickname",
             "photos",
             "created_at",
+            "updated_at",
         )
 
 
