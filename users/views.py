@@ -299,7 +299,7 @@ def SocialLogin(**kwargs):
         new_user.save()
         # 이후 토큰 발급해서 프론트로
         refresh = RefreshToken.for_user(new_user)
-        access_token = CustomTokenObtainPairSerializer.get_token(user)
+        access_token = CustomTokenObtainPairSerializer.get_token(new_user)
         return Response(
             {"refresh": str(refresh), "access": str(access_token.access_token)},
             status=status.HTTP_200_OK,
