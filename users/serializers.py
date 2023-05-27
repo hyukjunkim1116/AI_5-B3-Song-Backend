@@ -5,15 +5,6 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 # 유저 생성관련 시리얼라이저
 class UserSerializer(serializers.ModelSerializer):
-    like_comments = serializers.SerializerMethodField()
-    bookmarks = serializers.SerializerMethodField()
-    
-    def get_like_comments(self, obj):
-        return list(obj.like_comments.values())
-    
-    def get_bookmarks(self, obj):
-        return list(obj.bookmarks.values())
-    
     class Meta:
         model = User
         fields = "__all__"
@@ -45,3 +36,33 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["email"] = user.email
         token["nickname"] = user.nickname
         return token
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    like_comments = serializers.SerializerMethodField()
+    bookmarks = serializers.SerializerMethodField()
+    followings = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    followers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    
+    def get_like_comments(self, obj):
+        return list(obj.like_comments.values())
+    
+    def get_bookmarks(self, obj):
+        return list(obj.bookmarks.values())
+
+    class Meta:
+        model = User
+        exclude = (
+            "user_permissions",
+            "is_superuser",
+            "last_login",
+            "is_active",
+            "is_admin",
+            "password",
+            "groups",
+        )
+        extra_kwargs = {
+            "password": {
+                "write_only": True,  # 작성만 가능하도록 제한! 비밀번호 조회 불가
+            },
+        }

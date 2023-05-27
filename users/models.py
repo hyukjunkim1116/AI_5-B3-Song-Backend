@@ -48,7 +48,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     nickname = models.CharField("닉네임", max_length=20)
     password = models.CharField("비밀번호", max_length=256)
     genre = models.CharField("장르", max_length=256, null=True, blank=True)
-    age = models.IntegerField("나이", null=True)
+    age = models.PositiveIntegerField("나이", null=True)
     gender = models.CharField("성별", max_length=1, choices=GENDERS)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
