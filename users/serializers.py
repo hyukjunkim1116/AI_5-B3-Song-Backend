@@ -56,7 +56,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "user_permissions",
             "is_superuser",
             "last_login",
-            "login_type",
             "is_active",
             "is_admin",
             "password",
