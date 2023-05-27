@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import User
+import re
 
 
 class Article(models.Model):
@@ -10,9 +11,37 @@ class Article(models.Model):
         on_delete=models.CASCADE,
         related_name="articles",
     )
-    bookmark = models.ManyToManyField(User, blank=True, verbose_name="북마크", related_name="bookmarks")
+    bookmark = models.ManyToManyField(
+        User, blank=True, verbose_name="북마크", related_name="bookmarks"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.title)
+
+    def total_comments(self):
+        return self.comments.count()
+
+    def total_bookmarks(self):
+        return self.bookmark.count()
+
+    def comments_url_list(self):
+        comments = self.comments.all()
+        comment_dic = ""
+        url_regex = r"(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)"
+        reg = re.compile(url_regex)
+
+        for comment in comments:
+            res = reg.search(comment.comment)
+            if res:
+                indexes = res.span()
+                comment_url_txt = comment.comment[indexes[0] : indexes[1]]
+                article_id = comment.article.pk
+                comment_id = comment.id
+                comment_user = comment.user
+                comment_dic += f"게시글 id : {article_id} / 댓글 id : {comment_id} / 댓글 유저 이름 : {comment_user} / 댓글 유저는 ai인가? : 아직 구현 못함/ 댓글 내용 URL : {comment_url_txt}\n\n"
+        return comment_dic
 
 
 class Comment(models.Model):
@@ -21,7 +50,9 @@ class Comment(models.Model):
         Article, on_delete=models.CASCADE, related_name="comments"
     )
     comment = models.TextField()
-    like = models.ManyToManyField(User, blank=True, verbose_name="좋아요", related_name="like_comments")
+    like = models.ManyToManyField(
+        User, blank=True, verbose_name="좋아요", related_name="like_comments"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

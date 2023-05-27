@@ -1,13 +1,14 @@
 [tool.poetry]
-name = "ai-5-b3-sitename-backend"
+name = "ai-5-b3-song-backend"
 version = "0.1.0"
 description = ""
 authors = ["minjeong <ehdro418@naver.com>"]
 readme = "README.md"
-packages = [{include = "ai_5_b3_sitename_backend"}]
+packages = [{include = "ai_5_b3_song_backend"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+add-package = "^2.2.3"
 djangorestframework = "^3.14.0"
 djangorestframework-simplejwt = "^5.2.2"
 black = "^23.3.0"
@@ -15,6 +16,10 @@ django-cors-headers = "^4.0.0"
 mysqlclient = "^2.1.1"
 requests = "^2.31.0"
 openai = "^0.27.7"
+urllib3 = "^2.0.2"
+googlesearch-python = "^1.2.3"
+google-api-python-client = "^2.87.0"
+beautifulsoup4 = "^4.12.2"
 
 
 [build-system]

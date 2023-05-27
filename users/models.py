@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.urls import reverse
 
@@ -37,23 +38,26 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     GENDERS = [
         ("M", "Male"),
         ("F", "Female"),
     ]
     avatar = models.URLField(blank=True)
     email = models.EmailField("이메일", max_length=255, unique=True)
-    nickname = models.CharField("닉네임", max_length=20, unique=True)
+    nickname = models.CharField("닉네임", max_length=20)
     password = models.CharField("비밀번호", max_length=256)
     genre = models.CharField("장르", max_length=256, null=True, blank=True)
-    age = models.IntegerField("나이", null=True)
+    age = models.PositiveIntegerField("나이", null=True)
     gender = models.CharField("성별", max_length=1, choices=GENDERS)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     followings = models.ManyToManyField(
         "self", symmetrical=False, related_name="followers", blank=True
     )
+    """
+    symmetrical : 대칭여부설정 Ture라면 자동 맞팔, False라면 한쪽만 팔로우
+    """
     LOGIN_TYPES = [
         ("normal", "일반"),
         ("kakao", "카카오"),
@@ -64,7 +68,6 @@ class User(AbstractBaseUser):
     login_type = models.CharField(
         "로그인유형", max_length=10, choices=LOGIN_TYPES, default="normal"
     )
-
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     objects = UserManager()

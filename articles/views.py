@@ -22,12 +22,16 @@ from .serializers import (
     PhotoSerializer,
 )
 
+from django.db.models.query_utils import Q
+
 from django.http import JsonResponse
 from .models import Article, Comment
 
 from django.conf import settings
 import requests
-from .openai_utility import get_music_recommendation
+from .openai_utility import recommend_music_and_link
+
+import urllib
 
 
 class Articles(APIView):
@@ -40,6 +44,7 @@ class Articles(APIView):
         return JsonResponse({"detail": str(exception)}, status=500)
 
     def get(self, request):
+        """전체 게시글 목록 보기"""
         all_articles = Article.objects.all().order_by("-created_at")
         serializer = ArticleListSerializer(
             all_articles,
@@ -49,8 +54,10 @@ class Articles(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        """게시글 작성하기"""
         serializer = ArticleDetailSerializer(
             data=request.data,
+            # context={"request": request},
         )
         if serializer.is_valid():
             try:
@@ -65,43 +72,34 @@ class Articles(APIView):
                 status=HTTP_400_BAD_REQUEST,
             )
 
-    # 작성시 openai로 게시글 내용을 전달하는 함수.
     # def post(self, request):
-    #     serializer = ArticleDetailSerializer(
-    #         data=request.data,
-    #     )
-    #     if serializer.is_valid():
-    #         try:
-    #             article = serializer.save(owner=request.user)
-    #             content = request.data["content"]
-    #             recommendation = get_music_recommendation(content)
+    #     serializer = ArticleDetailSerializer(data=request.data)
 
-    #             # recommendation를 데이터베이스에 저장하거나 응답으로 반환할 수 있습니다.
-    #             serializer = ArticleDetailSerializer(article)
-
-    #             # Post the recommendation comment to CommentsView
-    #             url = f"{settings.API_BASE_URL}/articles/{article.id}/comments/"
-    #             print(url)
-    #             data = {"comment": recommendation}
-    #             print(data)
-    #             headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
-    #             print(headers)
-
-    #             response = requests.post(url, json=data, headers=headers)
-
-    #             # Check if POST request is successful
-    #             if response.status_code == status.HTTP_200_OK:
-    #                 print("Recommendation comment posted successfully")
-    #             else:
-    #                 print(
-    #                     "Error in posting recommendation comment", response.status_code
-    #                 )
-
-    #             return Response(serializer.data)
-    #         except Exception as e:
-    #             return self.handleError(request, e)
-    #     else:
+    #     if not serializer.is_valid():
     #         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    #     try:
+    #         article = serializer.save(owner=request.user)
+    #         content = request.data["content"]
+
+    #         recommendation, youtube_link = recommend_music_and_link(content)
+    #         link_comment = f"들려주신 사연을 듣고 어울릴만한 음악을 찾았어요! \n {youtube_link}"
+    #         serializer = ArticleDetailSerializer(article)
+
+    #         url = f"{settings.API_BASE_URL}/articles/{article.id}/comments/"
+    #         data = {"comment": link_comment}
+    #         headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
+    #         response = requests.post(url, json=data, headers=headers)
+    #         print(response)
+    #         if response.status_code != status.HTTP_200_OK:
+    #             print(
+    #                 "포스팅 오류",
+    #                 response.status_code,
+    #             )
+
+    #         return Response(serializer.data)
+    #     except Exception as e:
+    #         return JsonResponse({"detail": str(e)}, status=500)
 
 
 class ArticleDetail(APIView):
@@ -114,6 +112,7 @@ class ArticleDetail(APIView):
             raise NotFound
 
     def get(self, request, article_id):
+        """상세 게시글 보기"""
         article = self.get_object(article_id)
         serializer = ArticleDetailSerializer(
             article,
@@ -122,6 +121,7 @@ class ArticleDetail(APIView):
         return Response(serializer.data)
 
     def put(self, request, article_id):
+        """게시글 수정하기"""
         article = self.get_object(article_id)
 
         if article.owner != request.user:
@@ -143,6 +143,7 @@ class ArticleDetail(APIView):
             return Response(serializer.errors)
 
     def delete(self, request, article_id):
+        """게시글 삭제하기"""
         article = self.get_object(article_id)
         if article.owner != request.user:
             raise PermissionDenied
@@ -160,6 +161,7 @@ class ArticlePhotos(APIView):
             raise NotFound
 
     def post(self, request, article_id):
+        """게시글 사진 올리기"""
         article = self.get_object(article_id)
         if request.user != article.owner:
             raise PermissionDenied
@@ -194,7 +196,13 @@ class CommentsView(APIView):
 
 
 class CommentsDetailView(APIView):
-    def put(self, request, article_id, comment_id):
+    def get(self, request, comment_id):
+        """특정 댓글 조회"""
+        comment = get_object_or_404(Comment, id=comment_id)
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, comment_id):
         """댓글 수정"""
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.user:
@@ -207,7 +215,7 @@ class CommentsDetailView(APIView):
         else:
             return Response("권한이 없습니다!", status=status.HTTP_403_FORBIDDEN)
 
-    def delete(self, request, article_id, comment_id):
+    def delete(self, request, comment_id):
         """댓글 삭제"""
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.user:
@@ -228,7 +236,7 @@ class LikeView(APIView):
             comment.like.add(request.user)
             return Response("like", status=status.HTTP_200_OK)
 
-          
+
 class BookmarkView(APIView):
     def post(self, request, article_id):
         """게시글 북마크 하기"""
@@ -239,3 +247,19 @@ class BookmarkView(APIView):
         else:
             article.bookmark.add(request.user)
             return Response("bookmark", status=status.HTTP_200_OK)
+
+
+class SearchView(APIView):
+    def get(self, request, query):
+        """검색하기
+
+        제목이나 내용에 입력한 검색어가 포함되어 있는 게시글들을 가져옴"""
+        decoded_query = urllib.parse.unquote(query)
+        articles = Article.objects.filter(
+            Q(title__contains=decoded_query) | Q(content__contains=decoded_query)
+        )
+        serializer = ArticleListSerializer(articles, many=True)
+        if articles:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response("검색 결과가 없습니다", status=status.HTTP_204_NO_CONTENT)
