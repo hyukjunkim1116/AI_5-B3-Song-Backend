@@ -35,6 +35,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         token["email"] = user.email
         token["nickname"] = user.nickname
+        token["login_type"] = user.login_type
         return token
 
 
@@ -43,6 +44,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
     bookmarks = serializers.SerializerMethodField()
     followings = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     followers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    articles = serializers.SerializerMethodField()
+    
+    def get_articles(self, obj):
+        return obj.articles.count()
     
     def get_like_comments(self, obj):
         return list(obj.like_comments.values())
