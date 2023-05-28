@@ -179,7 +179,7 @@ class CommentsView(APIView):
         """댓글 보기"""
         if article_id:
             articles = get_object_or_404(Article, id=article_id)
-            comments = articles.comments.order_by("-created_at")
+            comments = articles.comments.all()
         else:
             comments = Comment.objects.all()
         serializer = CommentSerializer(comments, many=True)
