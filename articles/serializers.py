@@ -38,12 +38,16 @@ class CommentSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     user_id = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
+    user_avatar = serializers.SerializerMethodField()
 
     def get_user(self, obj):
         return obj.user.nickname
 
     def get_user_id(self, obj):
         return obj.user.id
+    
+    def get_user_avatar(self, obj):
+        return obj.user.avatar
 
     def get_like_count(self, obj):
         return obj.like.count()
