@@ -1,7 +1,5 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
-from rest_framework import status
-
 from users.models import User
 
 class UserRegistrationTest(APITestCase):
@@ -38,6 +36,14 @@ class UserRegistrationTest(APITestCase):
         
         
 class UserTest(APITestCase):
+    """유저 전체보기 테스트"""
+    def test_user_all_view(self):
+        url = reverse("user_all_view")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+        
+class UserProfileTest(APITestCase):
     def setUp(self):
         """유저 미리 만들기"""
         self.data = {"email": "test@test.test", "nickname":"test", "password": "1234"}

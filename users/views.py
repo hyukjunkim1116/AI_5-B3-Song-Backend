@@ -1,12 +1,11 @@
 import requests
-from django.shortcuts import redirect
 from my_settings import (
     KAKAO_REST_API_KEY,
     GOOGLE_API_KEY,
     NAVER_API_KEY,
     NAVER_SECRET_KEY,
 )
-from medias.serializers import PhotoSerializer, UserPhotoSerializer
+from medias.serializers import UserPhotoSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,7 +16,7 @@ from users.serializers import CustomTokenObtainPairSerializer, UserSerializer, U
 from users.models import User
 from articles.models import Article, Comment
 from articles.serializers import ArticleListSerializer, CommentSerializer
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class UserView(APIView):
@@ -119,7 +118,7 @@ class ProfileAticlesView(APIView):
 
     def get(self, request, user_id):
         """유저 프로필 게시글 조회"""
-        user_articles = Article.objects.filter(owner_id=user_id)
+        user_articles = Article.objects.filter(owner_id=user_id).order_by("-updated_at")
         serializer = ArticleListSerializer(
             user_articles,
             many=True,
@@ -131,7 +130,7 @@ class ProfileAticlesView(APIView):
 class ProfileLikesView(APIView):
     def get(self, request, user_id):
         """유저 프로필 좋아요 조회"""
-        comments = Comment.objects.filter(like=user_id)
+        comments = Comment.objects.filter(like=user_id).order_by("-updated_at")
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -139,7 +138,7 @@ class ProfileLikesView(APIView):
 class ProfileBookmarksView(APIView):
     def get(self, request, user_id):
         """유저 프로필 북마크 조회"""
-        user_articles = Article.objects.filter(bookmark=user_id)
+        user_articles = Article.objects.filter(bookmark=user_id).order_by("-updated_at")
         serializer = ArticleListSerializer(user_articles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -182,7 +181,7 @@ class KakaoLogin(APIView):
         data = {
             "grant_type": "authorization_code",
             "client_id": KAKAO_REST_API_KEY,
-            "redirect_uri": "http://127.0.0.1:5500/index.html",
+            "redirect_uri": "https://ddingsong.05online.store/index.html",
             "code": auth_code,
         }
         kakao_token = requests.post(
