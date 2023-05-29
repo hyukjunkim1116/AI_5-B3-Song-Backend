@@ -10,8 +10,6 @@ from rest_framework.status import (
 )
 from rest_framework.exceptions import (
     NotFound,
-    NotAuthenticated,
-    ParseError,
     PermissionDenied,
 )
 from .serializers import (
