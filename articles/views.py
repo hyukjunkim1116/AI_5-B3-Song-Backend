@@ -53,6 +53,7 @@ class Articles(APIView):
         )
         return Response(serializer.data)
 
+    # AI 사용하지 않는 게시글 작성 함수
     # def post(self, request):
     #     """게시글 작성하기"""
     #     serializer = ArticleDetailSerializer(
@@ -65,7 +66,7 @@ class Articles(APIView):
     #             serializer = ArticleDetailSerializer(article)
     #             return Response(serializer.data)
     #         except Exception as e:
-    #             print(e)
+    #             return Response(e, status=status.HTTP_400_BAD_REQUEST)
     #     else:
     #         return Response(
     #             serializer.errors,
@@ -90,9 +91,8 @@ class Articles(APIView):
             data = {"comment": link_comment}
             headers = {"Authorization": f"Bearer {request.auth.__str__()}"}
             response = requests.post(url, json=data, headers=headers)
-            print(response)
             if response.status_code != status.HTTP_200_OK:
-                print(
+                return Response(
                     "포스팅 오류",
                     response.status_code,
                 )
@@ -138,7 +138,7 @@ class ArticleDetail(APIView):
                 serializer = ArticleDetailSerializer(article)
                 return Response(serializer.data)
             except Exception as e:
-                print(e)
+                return Response(e, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors)
 
