@@ -119,7 +119,7 @@ class ProfileAticlesView(APIView):
 
     def get(self, request, user_id):
         """유저 프로필 게시글 조회"""
-        user_articles = Article.objects.filter(owner_id=user_id)
+        user_articles = Article.objects.filter(owner_id=user_id).order_by("-updated_at")
         serializer = ArticleListSerializer(
             user_articles,
             many=True,
@@ -131,7 +131,7 @@ class ProfileAticlesView(APIView):
 class ProfileLikesView(APIView):
     def get(self, request, user_id):
         """유저 프로필 좋아요 조회"""
-        comments = Comment.objects.filter(like=user_id)
+        comments = Comment.objects.filter(like=user_id).order_by("-updated_at")
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -139,7 +139,7 @@ class ProfileLikesView(APIView):
 class ProfileBookmarksView(APIView):
     def get(self, request, user_id):
         """유저 프로필 북마크 조회"""
-        user_articles = Article.objects.filter(bookmark=user_id)
+        user_articles = Article.objects.filter(bookmark=user_id).order_by("-updated_at")
         serializer = ArticleListSerializer(user_articles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
