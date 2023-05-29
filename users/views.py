@@ -1,12 +1,11 @@
 import requests
-from django.shortcuts import redirect
 from my_settings import (
     KAKAO_REST_API_KEY,
     GOOGLE_API_KEY,
     NAVER_API_KEY,
     NAVER_SECRET_KEY,
 )
-from medias.serializers import PhotoSerializer, UserPhotoSerializer
+from medias.serializers import UserPhotoSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,7 +16,7 @@ from users.serializers import CustomTokenObtainPairSerializer, UserSerializer, U
 from users.models import User
 from articles.models import Article, Comment
 from articles.serializers import ArticleListSerializer, CommentSerializer
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class UserView(APIView):
@@ -182,7 +181,7 @@ class KakaoLogin(APIView):
         data = {
             "grant_type": "authorization_code",
             "client_id": KAKAO_REST_API_KEY,
-            "redirect_uri": "http://127.0.0.1:5500/index.html",
+            "redirect_uri": "https://ddingsong.05online.store/index.html",
             "code": auth_code,
         }
         kakao_token = requests.post(
