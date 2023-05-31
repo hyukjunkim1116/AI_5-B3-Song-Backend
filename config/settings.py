@@ -25,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = my_settings.SECRET
-CF_ID = my_settings.CF_ID["CF_ID"]
-CF_TOKEN = my_settings.CF_TOKEN["CF_TOKEN"]
+# SECRET_KEY = my_settings.SECRET
+# CF_ID = my_settings.CF_ID["CF_ID"]
+# CF_TOKEN = my_settings.CF_TOKEN["CF_TOKEN"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -92,7 +92,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = my_settings.DATABASES
+# DATABASES = my_settings.DATABASES
 
 
 # Password validation
