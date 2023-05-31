@@ -15,6 +15,7 @@ from pathlib import Path
 import my_settings
 import os
 
+# feature/deploy 브랜치 생성
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
