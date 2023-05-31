@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 
-# import my_settings
+import my_settings
 import os
 
 
@@ -39,16 +39,16 @@ if POSTGRES_DB:
             "PORT": os.environ.get("POSTGRES_PORT", ""),
         }
     }
-
-
 # 환경변수가 존재하지 않을 경우 sqlite3을 사용합니다.
 else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+    DATABASES = my_settings.DATABASES
+# else:
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.sqlite3",
+#             "NAME": BASE_DIR / "db.sqlite3",
+#         }
+#     }
 # CORS 허용 목록에 ec2 ip를 추가합니다.
 CORS_ORIGIN_WHITELIST = ["http://13.209.5.137"]
 # CORS_ORIGIN_WHITELIST = ["http://$ec2_public_ip"]
@@ -62,10 +62,9 @@ CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = my_settings.SECRET
-SECRET_KEY = "django"
-# CF_ID = my_settings.CF_ID["CF_ID"]
-# CF_TOKEN = my_settings.CF_TOKEN["CF_TOKEN"]
+SECRET_KEY = my_settings.SECRET
+CF_ID = my_settings.CF_ID["CF_ID"]
+CF_TOKEN = my_settings.CF_TOKEN["CF_TOKEN"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -127,8 +126,6 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-# DATABASES = my_settings.DATABASES
 
 
 # Password validation

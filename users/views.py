@@ -1,11 +1,11 @@
 import requests
 
-# from my_settings import (
-#     KAKAO_REST_API_KEY,
-#     GOOGLE_API_KEY,
-#     NAVER_API_KEY,
-#     NAVER_SECRET_KEY,
-# )
+from my_settings import (
+    KAKAO_REST_API_KEY,
+    GOOGLE_API_KEY,
+    NAVER_API_KEY,
+    NAVER_SECRET_KEY,
+)
 from medias.serializers import UserPhotoSerializer
 from rest_framework import status
 from rest_framework.views import APIView
