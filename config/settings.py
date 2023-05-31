@@ -26,6 +26,7 @@ DEBUG = os.environ.get("DEBUG", "0") == "1"
 ALLOWED_HOSTS = [
     "backend",
 ]
+DATABASES = my_settings.DATABASES
 # postgres 환경변수가 존재 할 경우에 postgres db에 연결을 시도합니다.
 POSTGRES_DB = os.environ.get("POSTGRES_DB", "")
 if POSTGRES_DB:
@@ -39,8 +40,6 @@ if POSTGRES_DB:
         }
     }
 # 환경변수가 존재하지 않을 경우 sqlite3을 사용합니다.
-else:
-    DATABASES = my_settings.DATABASES
 # else:
 #     DATABASES = {
 #         "default": {
