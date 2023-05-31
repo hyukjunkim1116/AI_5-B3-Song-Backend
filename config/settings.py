@@ -16,9 +16,46 @@ from pathlib import Path
 # import my_settings
 import os
 
+
 # feature/deploy 브랜치 생성
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+# 환경변수에 따라 DEBUG모드 여부를 결정합니다.
+DEBUG = os.environ.get("DEBUG", "0") == "1"
+# 접속을 허용할 host를 설정합니다.
+ALLOWED_HOSTS = [
+    "backend",
+]
+# postgres 환경변수가 존재 할 경우에 postgres db에 연결을 시도합니다.
+POSTGRES_DB = os.environ.get("POSTGRES_DB", "")
+if POSTGRES_DB:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": POSTGRES_DB,
+            "USER": os.environ.get("POSTGRES_USER", ""),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
+            "HOST": os.environ.get("POSTGRES_HOST", ""),
+            "PORT": os.environ.get("POSTGRES_PORT", ""),
+        }
+    }
+
+
+# 환경변수가 존재하지 않을 경우 sqlite3을 사용합니다.
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+# CORS 허용 목록에 ec2 ip를 추가합니다.
+CORS_ORIGIN_WHITELIST = ["http://13.209.5.137"]
+# CORS_ORIGIN_WHITELIST = ["http://$ec2_public_ip"]
+# ex) CORS_ORIGIN_WHITELIST = ['http://43.201.72.190']
+
+# CSRF 허용 목록을 CORS와 동일하게 설정합니다.
+CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 
 
 # Quick-start development settings - unsuitable for production
@@ -32,8 +69,6 @@ SECRET_KEY = "django"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
