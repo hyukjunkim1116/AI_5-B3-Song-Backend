@@ -12,7 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
-import my_settings
+
+# import my_settings
 import os
 
 # feature/deploy 브랜치 생성
