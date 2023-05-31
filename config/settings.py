@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
-
 import my_settings
 import os
 
@@ -26,7 +25,7 @@ DEBUG = os.environ.get("DEBUG", "0") == "1"
 ALLOWED_HOSTS = [
     "backend",
 ]
-DATABASES = my_settings.DATABASES
+
 # postgres 환경변수가 존재 할 경우에 postgres db에 연결을 시도합니다.
 POSTGRES_DB = os.environ.get("POSTGRES_DB", "")
 if POSTGRES_DB:
@@ -40,6 +39,8 @@ if POSTGRES_DB:
             "PORT": os.environ.get("POSTGRES_PORT", ""),
         }
     }
+else:
+    DATABASES = my_settings.DATABASES
 # 환경변수가 존재하지 않을 경우 sqlite3을 사용합니다.
 # else:
 #     DATABASES = {
