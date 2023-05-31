@@ -1,10 +1,11 @@
 import requests
-from my_settings import (
-    KAKAO_REST_API_KEY,
-    GOOGLE_API_KEY,
-    NAVER_API_KEY,
-    NAVER_SECRET_KEY,
-)
+
+# from my_settings import (
+#     KAKAO_REST_API_KEY,
+#     GOOGLE_API_KEY,
+#     NAVER_API_KEY,
+#     NAVER_SECRET_KEY,
+# )
 from medias.serializers import UserPhotoSerializer
 from rest_framework import status
 from rest_framework.views import APIView
@@ -12,7 +13,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.generics import get_object_or_404
-from users.serializers import CustomTokenObtainPairSerializer, UserSerializer, UserProfileSerializer
+from users.serializers import (
+    CustomTokenObtainPairSerializer,
+    UserSerializer,
+    UserProfileSerializer,
+)
 from users.models import User
 from articles.models import Article, Comment
 from articles.serializers import ArticleListSerializer, CommentSerializer
