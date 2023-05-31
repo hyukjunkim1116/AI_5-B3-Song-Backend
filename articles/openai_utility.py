@@ -3,7 +3,7 @@ import googleapiclient.discovery
 import googleapiclient.errors
 import re
 
-# from my_settings import OPENAI_API_KEY, YOUTUBE_API_KEY
+from my_settings import OPENAI_API_KEY, YOUTUBE_API_KEY
 
 # GPT API 키 설정
 openai.api_key = OPENAI_API_KEY
