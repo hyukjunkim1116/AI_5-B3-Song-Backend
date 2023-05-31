@@ -49,13 +49,6 @@ else:
 #             "NAME": BASE_DIR / "db.sqlite3",
 #         }
 #     }
-# CORS 허용 목록에 ec2 ip를 추가합니다.
-CORS_ORIGIN_WHITELIST = ["http://13.209.5.137"]
-# CORS_ORIGIN_WHITELIST = ["http://$ec2_public_ip"]
-# ex) CORS_ORIGIN_WHITELIST = ['http://43.201.72.190']
-
-# CSRF 허용 목록을 CORS와 동일하게 설정합니다.
-CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 
 
 # Quick-start development settings - unsuitable for production
@@ -206,6 +199,17 @@ SIMPLE_JWT = {
 }
 
 # CORS
+# CORS 허용 목록에 ec2 ip를 추가합니다.
+# CORS_ORIGIN_WHITELIST = ["http://$ec2_public_ip"]
+# ex) CORS_ORIGIN_WHITELIST = ['http://43.201.72.190']
+
+# CSRF 허용 목록을 CORS와 동일하게 설정합니다.
+# CORS 허용 목록에 도메인 서버를 추가합니다.
+CORS_ORIGIN_WHITELIST = ["https://www.drinkdrinkdrink.xyz", "http://13.209.5.137"]
+# CORS_ORIGIN_WHITELIST = ['https://www.$domain', ]
+
+# CSRF 허용 목록을 CORS와 동일하게 설정합니다.
+CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
