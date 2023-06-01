@@ -1,8 +1,7 @@
 # Created by https://www.toptal.com/developers/gitignore/api/vim,linux,macos,django,python,windows,visualstudiocode,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=vim,linux,macos,django,python,windows,visualstudiocode,pycharm
 
-.poetry.lock
-.pyproject.toml
+
 ### settings.py ###
 my_settings.py
 
