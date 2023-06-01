@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 # 접속을 허용할 host를 설정합니다.
 ALLOWED_HOSTS = [
-    "backend",
+    "*",
 ]
 
 # postgres 환경변수가 존재 할 경우에 postgres db에 연결을 시도합니다.
