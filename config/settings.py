@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 # 접속을 허용할 host를 설정합니다.
 ALLOWED_HOSTS = [
-    "*",
+    "backend",
 ]
 
 # postgres 환경변수가 존재 할 경우에 postgres db에 연결을 시도합니다.
@@ -206,12 +206,12 @@ SIMPLE_JWT = {
 
 # CSRF 허용 목록을 CORS와 동일하게 설정합니다.
 # CORS 허용 목록에 도메인 서버를 추가합니다.
-CORS_ORIGIN_WHITELIST = ["https://www.drinkdrinkdrink.xyz", "http://13.209.5.137"]
+CORS_ORIGIN_WHITELIST = ["http://172.31.45.53"]
 # CORS_ORIGIN_WHITELIST = ['https://www.$domain', ]
 
 # CSRF 허용 목록을 CORS와 동일하게 설정합니다.
 CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = (
