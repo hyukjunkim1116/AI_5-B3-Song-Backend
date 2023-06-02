@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "users",
     "articles",
     "medias",
+    "corsheaders",
 ]
 
 REST_FRAMEWORK = {
