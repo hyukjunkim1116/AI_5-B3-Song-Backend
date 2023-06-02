@@ -80,9 +80,9 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -210,7 +210,7 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
     "http://localhost:8000",
     "http://localhost:8080",
-    "https://www.drinkdrinkdrink.xyz",
+    "https://drinkdrinkdrink.xyz",
 ]
 
 
@@ -225,7 +225,7 @@ CORS_ORIGIN_WHITELIST = [
 # CSRF 허용 목록을 CORS와 동일하게 설정합니다.
 CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = (
