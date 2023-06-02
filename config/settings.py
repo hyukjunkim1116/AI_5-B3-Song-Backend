@@ -206,7 +206,7 @@ SIMPLE_JWT = {
 
 # CSRF 허용 목록을 CORS와 동일하게 설정합니다.
 # CORS 허용 목록에 도메인 서버를 추가합니다.
-CORS_ORIGIN_WHITELIST = ["http://172.31.45.53"]
+CORS_ORIGIN_WHITELIST = ["http://13.125.210.203"]
 # CORS_ORIGIN_WHITELIST = ['https://www.$domain', ]
 
 # CSRF 허용 목록을 CORS와 동일하게 설정합니다.
