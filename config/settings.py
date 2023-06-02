@@ -27,6 +27,7 @@ ALLOWED_HOSTS = [
     "backend",
     " http://43.201.106.106",
     "https://drinkdrinkdrink.xyz",
+    "https://d1frubqmrm2k9j.cloudfront.net",
 ]
 
 # postgres 환경변수가 존재 할 경우에 postgres db에 연결을 시도합니다.
@@ -222,11 +223,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://43.201.106.106",
     "https://www.backend.drinkdrinkdrink.xyz",
     "https://www.drinkdrinkdrink.xyz",
+    "https://d1frubqmrm2k9j.cloudfront.net",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "http://43.201.106.106",
     "https://www.backend.drinkdrinkdrink.xyz",
     "https://www.drinkdrinkdrink.xyz",
+    "https://d1frubqmrm2k9j.cloudfront.net",
 ]
 # CSRF 허용 목록을 CORS와 동일하게 설정합니다.
 # CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
