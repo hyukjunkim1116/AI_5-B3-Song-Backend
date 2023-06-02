@@ -206,21 +206,26 @@ SIMPLE_JWT = {
 # ]
 # CORS_ORIGIN_WHITELIST = ['https://www.$domain', ]
 # CORS 허용 목록에 도메인 서버를 추가합니다.
-# CORS_ORIGIN_WHITELIST = ['https://www.$domain', ]
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://localhost:8080",
+    "https://www.drinkdrinkdrink.xyz",
+]
 
 
-CORS_ALLOWED_ORIGINS = [
-    "https://drinkdrinkdrink.xyz",
-    "https://d1frubqmrm2k9j.cloudfront.net",
-]
-CSRF_TRUSTED_ORIGINS = [
-    "https://drinkdrinkdrink.xyz",
-    "https://d1frubqmrm2k9j.cloudfront.net",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "https://drinkdrinkdrink.xyz",
+#     "https://d1frubqmrm2k9j.cloudfront.net",
+# ]
+# CSRF_TRUSTED_ORIGINS = [
+#     "https://drinkdrinkdrink.xyz",
+#     "https://d1frubqmrm2k9j.cloudfront.net",
+# ]
 # CSRF 허용 목록을 CORS와 동일하게 설정합니다.
-# CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
+CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 
-# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = (
