@@ -214,13 +214,13 @@ SIMPLE_JWT = {
 
 CORS_ALLOWED_ORIGINS = [
     "https://*.drinkdrinkdrink.xyz",
+    "https://drinkdrinkdrink.xyz",
     "https://www.backend.drinkdrinkdrink.xyz",
-    "*.drinkdrinkdrink.xyz",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://*.drinkdrinkdrink.xyz",
+    "https://drinkdrinkdrink.xyz",
     "https://www.backend.drinkdrinkdrink.xyz",
-    "*.drinkdrinkdrink.xyz",
 ]
 # CSRF 허용 목록을 CORS와 동일하게 설정합니다.
 
