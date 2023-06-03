@@ -16,7 +16,7 @@ DEBUG = os.environ.get("DEBUG", "0") == "1"
 # 접속을 허용할 host를 설정합니다.
 ALLOWED_HOSTS = [
     "https://drinkdrinkdrink.xyz",
-    "https://backend.drinkdrinkdrink.xyz",
+    "https://www.backend.drinkdrinkdrink.xyz",
     "backend",
 ]
 
@@ -227,25 +227,6 @@ CSRF_TRUSTED_ORIGINS = [
 # CORS_ORIGIN_ALLOW_ALL = True
 
 
-CORS_ALLOW_METHODS = (
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "POST",
-    "PUT",
-)
-
-CORS_ALLOW_HEADERS = (
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-)
 CORS_ALLOW_CREDENTIALS = True
 
 AUTH_USER_MODEL = "users.User"
