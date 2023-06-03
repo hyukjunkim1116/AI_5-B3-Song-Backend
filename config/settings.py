@@ -15,11 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 # 접속을 허용할 host를 설정합니다.
 ALLOWED_HOSTS = [
-    "backend",
-    "43.201.106.106",
-    "drinkdrinkdrink.xyz",
     "backend.drinkdrinkdrink.xyz",
-    "d1frubqmrm2k9j.cloudfront.net",
 ]
 
 # postgres 환경변수가 존재 할 경우에 postgres db에 연결을 시도합니다.
@@ -206,48 +202,24 @@ SIMPLE_JWT = {
 # ]
 # CORS_ORIGIN_WHITELIST = ['https://www.$domain', ]
 # CORS 허용 목록에 도메인 서버를 추가합니다.
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:3000",
-    "http://localhost:8000",
-    "http://localhost:8080",
+# CORS_ORIGIN_WHITELIST = [
+#     "http://localhost:3000",
+#     "http://localhost:8000",
+#     "http://localhost:8080",
+#     "https://drinkdrinkdrink.xyz",
+# ]
+
+
+CORS_ALLOWED_ORIGINS = [
     "https://drinkdrinkdrink.xyz",
 ]
-
-
-# CORS_ALLOWED_ORIGINS = [
-#     "https://drinkdrinkdrink.xyz",
-#     "https://d1frubqmrm2k9j.cloudfront.net",
-# ]
-# CSRF_TRUSTED_ORIGINS = [
-#     "https://drinkdrinkdrink.xyz",
-#     "https://d1frubqmrm2k9j.cloudfront.net",
-# ]
+CSRF_TRUSTED_ORIGINS = [
+    "https://drinkdrinkdrink.xyz",
+]
 # CSRF 허용 목록을 CORS와 동일하게 설정합니다.
-CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-
-CORS_ALLOW_METHODS = (
-    "DELETE",
-    "GET",
-    # 'OPTIONS',
-    # 'PATCH',
-    "POST",
-    "PUT",
-)
-
-CORS_ALLOW_HEADERS = (
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-)
 
 AUTH_USER_MODEL = "users.User"
 
