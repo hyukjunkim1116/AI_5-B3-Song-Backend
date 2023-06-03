@@ -213,12 +213,12 @@ SIMPLE_JWT = {
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://drinkdrinkdrink.xyz",
+    "https://*.drinkdrinkdrink.xyz",
     "https://backend.drinkdrinkdrink.xyz",
     "backend.drinkdrinkdrink.xyz",
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "https://drinkdrinkdrink.xyz",
+    "https://*.drinkdrinkdrink.xyz",
     "https://backend.drinkdrinkdrink.xyz",
     "backend.drinkdrinkdrink.xyz",
 ]
