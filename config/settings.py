@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 # 접속을 허용할 host를 설정합니다.
 ALLOWED_HOSTS = [
-    "backend.drinkdrinkdrink.xyz:8000",
+    "https://drinkdrinkdrink.xyz:8000",
     "backend:8000",
 ]
 
