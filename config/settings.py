@@ -231,4 +231,4 @@ CORS_ALLOW_CREDENTIALS = True
 
 AUTH_USER_MODEL = "users.User"
 
-API_BASE_URL = "https://www.backend.drinkdrinkdrink.xyz"
+API_BASE_URL = "https://www.backend.drinkdrinkdrink.xyz/api"
